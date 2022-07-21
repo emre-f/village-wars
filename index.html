@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Firebase Multiplayer Demo</title>
+    <link rel="icon" href="favicon.ico?" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/styles.css" type="text/css">
+  </head>
+  <body>
+
+    <div class="game-container">
+    </div>
+    <div class="player-info" style="z-index: 2;">
+      <div>
+        <label for="player-name">Your Name</label>
+        <input id="player-name" maxlength="10" type="text" />
+      </div>
+      <div>
+        <button id="player-color">Change Color</button>
+      </div>
+    </div>
+
+    <!-- the backbone -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <!-- the authentication -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <!-- the database -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <script>
+      // NOTE - INCLUDE YOUR FIREBASE CONFIG HERE FOR ANYTHING TO WORK:
+      const firebaseConfig = {
+        apiKey: "AIzaSyB-sc2z2lTVWe23tNaKx5_kYOEbSdmuxP4",
+        authDomain: "village-wars.firebaseapp.com",
+        databaseURL: "https://village-wars-default-rtdb.firebaseio.com",
+        projectId: "village-wars",
+        storageBucket: "village-wars.appspot.com",
+        messagingSenderId: "797809335456",
+        appId: "1:797809335456:web:16e90003b1601a0e657dc5",
+        measurementId: "G-8FNFP3SGWL"
+      };
+      firebase.initializeApp(firebaseConfig);
+    </script>
+
+    <script src="KeyPressListener.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
