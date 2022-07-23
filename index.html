@@ -7,12 +7,18 @@
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles/styles.css" type="text/css">
+    <link rel="stylesheet" href="styles/characters.css" type="text/css">
   </head>
   <body>
 
-    <div class="game-container">
+    <div class="camera">
+      <div class="game-container">
+        
+      </div>
     </div>
-    <div class="player-info" style="z-index: 2;">
+    
+    </div>
+    <!-- <div class="player-info" style="z-index: 2;">
       <div>
         <label for="player-name">Your Name</label>
         <input id="player-name" maxlength="10" type="text" />
@@ -20,7 +26,7 @@
       <div>
         <button id="player-color">Change Color</button>
       </div>
-    </div>
+    </div> -->
 
     <!-- the backbone -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -46,5 +52,6 @@
 
     <script src="KeyPressListener.js"></script>
     <script src="app.js"></script>
+    <script src="utils.js"></script>
   </body>
 </html>

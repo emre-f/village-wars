@@ -1,0 +1,69 @@
+.Character {
+    transition: transform 0.4s;
+}
+
+.Character {
+    width: calc( var(--grid-cell)* 2 );
+    height: calc( var(--grid-cell)* 2 );
+    position: absolute;
+
+    /* Hiding it makes the name panels invisible */
+    /* overflow:hidden; */
+}
+
+.Character[you="true"] {
+    z-index: 1;
+}
+
+.Character_sprite {
+    overflow: hidden;
+    top: -3px;
+    background: url(/images/Unit/medievalUnit_01.png);
+    transform: scale(2);
+}
+
+.Character_shadow {
+    background: url(/images/Unit/shadow.png) no-repeat no-repeat;
+    transform: scale(3);
+    top: 80px;
+    left: 70px;
+}
+
+.Character_name-container {
+    position: absolute;
+    top: -18px;
+    left: 18px;
+    font-size: 6px;
+    padding: 1px 2px 1px;
+    border-radius: 3px;
+    background: #333;
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transform: scale(2);
+}
+
+.Character_effects-container {
+    position: absolute;
+    top: -36px;
+    left: -2px;
+    font-size: 6px;
+    padding: 1px 2px 1px;
+    border-radius: 3px;
+    background: rgba(1, 1, 1, 0);
+    color: #333;
+    font-weight: bold;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transform: scale(2);
+}
+
+/* .Character[you="true"] .Character_name-container {
+    color: rgb(72, 255, 0);
+} */
+
+.Character_health {
+    margin-left: 1px;
+    color: rgb(72, 255, 0);
+  }

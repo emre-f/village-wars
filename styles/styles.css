@@ -1,21 +1,94 @@
+:root {
+    --pixel-size: 4px;
+    --grid-cell: calc( var(--pixel-size) * 16);
+    --bg: #333;
+    --camera-width-multi: 288;
+    --camera-height-multi: 156;
+    /* --camera-width-multi-base: 144; */
+    /* --camera-height-multi-base: 78; */
+}
+/* 384, 208 */
+
+/* RESIZE MAP FOR DIFFERENT SCREEN SIZES (LARGER GAME) */
+/* 4/3 */
+/* @media( min-width: 800px ) {
+    :root {
+        --pixel-size: 2px;
+        --camera-width-multi: calc( var(--camera-width-multi-base) * 4 / 3);
+        --camera-height-multi: calc( var(--camera-height-multi-base) * 4 / 3);
+    }
+} */
+/* 6/3 */
+/* @media( min-width: 1200px ) {
+    :root {
+        --pixel-size: 3px;
+        --camera-width-multi: calc( var(--camera-width-multi-base) * 2);
+        --camera-height-multi: calc( var(--camera-height-multi-base) * 2);
+    }
+} */
+/* 8/3 */
+/* @media( min-width: 1600px ) {
+    :root {
+        --pixel-size: 4px;
+        --camera-width-multi: calc(var(--camera-width-multi-base) * 8 / 3);
+        --camera-height-multi: calc(var(--camera-height-multi-base) * 8 / 3);
+    }
+} */
+
 html, body {
-    margin: 0;
-    padding: 0;
     height: 100%;
-    background: linear-gradient(180deg, #64BEFF -50%, #6e96ff 69.71%, #2a65ff 150%);
-    font-family: 'Source Sans Pro', sans-serif;
+}
+
+body {
+    background: var(--bg);
     display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+/* was 160, 144 */
+.camera {
+    width: calc(4px * var(--camera-width-multi));
+    height: calc(4px * var(--camera-height-multi));
+    overflow: hidden;
+    background: #61ddf7;
+    position:relative;
+}
+
+.game-container {
+    transition: transform 0.4s;
+}
+
+.game-container {
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -webkit-crisp-edges;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+
+    background-size: 100%;
+    position: relative;
+}
+
+.unit-cell-holder {
+    background-size: 100%;
+    position: relative;
+}
+
+.grid-cell {
+    position: absolute;
+    width: 64px;
+    height: 64px;
+    /* margin: 0; */
 }
 
 .unit-cell {
-    height: 64px;
-    width: 64px;
-    margin: 0;
-    position: absolute;
+    /* outline: 1px solid rgba(51, 51, 51, 0.35); */
+    width: 64;
+    height: 64;
 }
 
 .Unit-cell-sprite {
-    background: url(/images/Tile/medievalTile_43.png) no-repeat no-repeat;
-    height: 64px;
-    width: 64px;
+    background: url(/images/Tile/medievalTile_57.png) no-repeat no-repeat;
 }
+
