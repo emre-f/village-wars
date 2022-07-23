@@ -1,3 +1,5 @@
+const MAP_SIZE = 30;
+
 function generateMap(mapSize) {
     // Clear out old unit cells
     // const allUnitCellsRef = firebase.database().ref(`unitCells`);
@@ -20,6 +22,7 @@ function generateMap(mapSize) {
 (function () {
     const gameContainer = document.querySelector(".game-container");
     const unitCellHolderElement = document.createElement("div");
+    const resourcesHolderElement = document.createElement("div");
     const cameraElement = document.querySelector(".camera");
 
     let players = {};
@@ -29,6 +32,9 @@ function generateMap(mapSize) {
 
     let unitCells = {};
     let unitCellElements = {};
+
+    let resources = {};
+    let resourcesElements = {};
 
     // PLAYER MOVEMENT//start in the middle of the map
     var pixel_size;
@@ -40,10 +46,13 @@ function generateMap(mapSize) {
     var y = pixel_size * 72;
     x = 64;
     y = 64;
-    speed = 16;
+    speed = 1;
     var held_directions = []; //State of which arrow keys we are holding down
     var moveTimer = 0.5;
     var moveTimerCD = 0.5;
+
+    var resourceSpawnTimer = 6;
+    var resourceSpawnTimerCD = 16;
 
     /* Direction key state */
     const directions = {
@@ -132,8 +141,8 @@ function generateMap(mapSize) {
                 let newAdminPlayer = players[Object.keys(players)[0]];
                 console.log("New Admin Player: " + newAdminPlayer.name + " (ID: " + newAdminPlayer.id + ")");
 
-                playerRef = firebase.database().ref(`players/${newAdminPlayer.id}`);
-                playerRef.update({
+                var adminPlayerRef = firebase.database().ref(`players/${newAdminPlayer.id}`);
+                adminPlayerRef.update({
                     adminPlayer : true,
                 })
             }
@@ -141,16 +150,16 @@ function generateMap(mapSize) {
             Object.keys(players).forEach((key) => { // For each player...
                 const characterState = players[key];
                 let el = playerElements[key];
-     
+                
                 // Now update the DOM
                 el.querySelector(".Character_name").innerText = characterState.name;
                 el.querySelector(".Character_health").innerText = characterState.health;
                 // el.setAttribute("data-color", characterState.color);
                 el.setAttribute("data-direction", characterState.direction);
                 const left = 64 * characterState.x + "px";
-                const top = 64 * characterState.y - 16 + "px";
-                // el.style.transform = `translate3d(${left}, ${top}, 0)`;
-                el.style.transform = `translate3d( ${ characterState.x * pixel_size }px, ${ characterState.y * pixel_size }px, 0 )`;
+                const top = (64 * characterState.y - 16) + "px";
+  
+                el.style.transform = `translate3d(${left}, ${top}, 0)`;
 
                 // Lower characters should appear at the front!
                 el.style.zIndex = Math.round(characterState.y / 16);
@@ -170,6 +179,17 @@ function generateMap(mapSize) {
                 if(el.getAttribute("you") === "true") {
                     effectsContainer = effectsContainer + `<span class="Character_you-container">&#128994;</span>`;
                     el.style.zIndex += 1; // If YOU are the player, be even more above
+
+                    // Remove your player if health is less than 0
+                    if(characterState.health <= 0) {
+                        playerRef.remove();
+                    }
+
+                    // Update your stats on UI
+                    document.querySelector(".player-health").innerText = characterState.health;
+                    document.querySelector(".player-gold").innerText = characterState.gold;
+                    document.querySelector(".player-wood").innerText = characterState.wood;
+                    document.querySelector(".player-meat").innerText = characterState.meat;
                 } 
 
                 el.querySelector(".Character_effects-container").innerHTML = effectsContainer;
@@ -221,7 +241,123 @@ function generateMap(mapSize) {
             gameContainer.removeChild(playerElements[removedKey]);
             delete playerElements[removedKey];
         })
-        console.log("PLAYERS AFTER", players)
+    }
+
+    function manageResources() {
+        const allResourcesRef = firebase.database().ref(`resources`);
+        allResourcesRef.on("value", (snapshot) => {
+    
+            //Fires whenever a change occurs
+            resources = snapshot.val() || {};
+
+            Object.keys(resources).forEach((key) => {
+
+                const resourceState = resources[key];
+                let el = resourcesElements[key];
+     
+                // Now update the DOM
+                el.querySelector(".Resource_amount_left").innerText = resourceState.amountLeft;
+                el.querySelector(".Resource_amount_max").innerText = resourceState.amountMax;
+
+                // Lower characters should appear at the front!
+                el.style.zIndex = Math.round(resourceState.y / 16);
+
+                if(resourceState.amountLeft <= 0) {
+                    resourceRef = firebase.database().ref(`resources/${getKeyString(resourceState.x, resourceState.y)}`);
+                    resourceRef.remove();
+                }
+            })
+        })
+    
+        allResourcesRef.on("child_added", (snapshot) => {
+            //Fires whenever a new node is added the tree
+            const addedResource = snapshot.val();
+            const key = getKeyString(addedResource.x, addedResource.y);
+    
+            const resourceElement = document.createElement("div");
+            resourceElement.classList.add("Resource", "grid-cell");
+    
+            resourceElement.innerHTML = (`
+                <div class="Resource_shadow grid-cell"></div>
+                <div class="Resource_sprite grid-cell"></div>
+                <div class="Resource_amount-container">
+                    <span class="Resource_amount_left">0</span>/<span class="Resource_amount_max">0</span>
+                </div>
+            `);
+    
+            //Fill in some initial state
+            resourceElement.setAttribute("data-position", `${getKeyString(addedResource.x, addedResource.y)}`);
+            resourceElement.querySelector(".Resource_sprite").setAttribute("data-resource-type", addedResource.type);
+            resourceElement.querySelector(".Resource_amount_left").innerText = addedResource.amountLeft;
+            resourceElement.querySelector(".Resource_amount_max").innerText = addedResource.amountMax;
+
+            // Position the Element
+            const left = 64 * addedResource.x + "px";
+            const top = 64 * addedResource.y + "px";
+            resourceElement.style.transform = `translate3d(${left}, ${top}, 0)`;
+
+            resourcesElements[key] = resourceElement;
+            gameContainer.appendChild(resourceElement);
+        })
+    
+    
+        //Remove character DOM element after they leave
+        allResourcesRef.on("child_removed", (snapshot) => {
+            const removedKey = getKeyString(snapshot.val().x, snapshot.val().y);
+            gameContainer.removeChild(resourcesElements[removedKey]);
+            delete resourcesElements[removedKey];
+        })
+    }
+
+    function resourceHandler() {
+
+        if(resourceSpawnTimer >= resourceSpawnTimerCD) {
+            spawnResources("wood");
+            spawnResources("gold");
+            spawnResources("meat");
+
+            resourceSpawnTimer = 0;
+        } else {
+            resourceSpawnTimer += 1/60;
+        }
+    }
+
+    function spawnResources(type) {
+        
+        // Type has to be "wood", "gold" or "meat"
+        if (type !== "wood" && type !== "gold" && type !== "meat") {
+            console.log("ERROR: INCORRECT INPUT FOR SPAWN RESOURCE")
+            return;
+        }
+        
+        var lastPos = { x: -1, y: -1 }
+        var n = 0;
+
+        while(true) {
+            lastPos = {
+                x: Math.floor(0 + Math.random() * (MAP_SIZE - 0)),
+                y: Math.floor(0 + Math.random() * (MAP_SIZE - 0))
+            }
+
+            if(!isOccupiedByPlayer(lastPos.x, lastPos.y, players) && !isOccupiedByPlayer(lastPos.x, lastPos.y, resources)) {
+                break;
+            } else {
+                n += 1;
+                if (n >= 100) {
+                    console.log("ERROR: NO EMPTY SPOT FOUND!");
+                    break;
+                }
+            }
+        }
+
+        const resourceRef = firebase.database().ref(`resources/${getKeyString(lastPos.x, lastPos.y)}`);
+        resourceRef.set({
+            type: type,
+            x: lastPos.x,
+            y: lastPos.y,
+            amountLeft: 100,
+            amountMax: 100,
+        })
     }
 
     function moveCharacter() {
@@ -245,17 +381,37 @@ function generateMap(mapSize) {
 
             // Check if new position is occupied
             var hitTarget = isOccupiedByPlayer(newX, newY, players)
+            
             if(hitTarget) {
                 firebase.database().ref(`players/${hitTarget.id}`).update({ health: hitTarget.health - 1 });
+                return;
+            }
+
+            var hitResource = isOccupiedByPlayer(newX, newY, resources)
+
+            if(hitResource) {
+                firebase.database().ref(`resources/${getKeyString(hitResource.x, hitResource.y)}`).update( { amountLeft: hitResource.amountLeft - 10 } );
+                var plyr = players[playerId];
+   
+                // Give yourself the resource
+                if(hitResource.type === "wood") {
+                    playerRef.update( { wood: plyr.wood + 10 } )
+                } else if(hitResource.type === "gold") {
+                    playerRef.update( { gold: plyr.gold + 10 } )
+                } else if(hitResource.type === "meat") {
+                    playerRef.update( { meat: plyr.meat + 10 } )
+                }
+
                 return;
             }
         }
 
         // TO DO: Put map limits here
-        
-        players[playerId].x = newX;
-        players[playerId].y = newY;
-        playerRef.set(players[playerId]);
+        if (newX >= 0 && newX < MAP_SIZE * 16 && newY >= 0 && newY < MAP_SIZE * 16) {
+            players[playerId].x = newX;
+            players[playerId].y = newY;
+            playerRef.set(players[playerId]);
+        }
     }
 
     function setCamera() {
@@ -272,12 +428,12 @@ function generateMap(mapSize) {
         var camera_top = -32 + cameraHeight / 2; // More (-), higher up
 
         gameContainer.style.transform = `translate3d( 
-            ${ -players[playerId].x * pixel_size + camera_left }px, ${ -players[playerId].y * pixel_size + camera_top }px, 0 
+            ${ -players[playerId].x * pixel_size * 16 + camera_left }px, ${ -players[playerId].y * pixel_size * 16 + camera_top }px, 0 
         )`;
 
-        playerElements[playerId].style.transform = `translate3d( 
-            ${ players[playerId].x * pixel_size }px, ${ players[playerId].y * pixel_size }px, 0 
-        )`;
+        // playerElements[playerId].style.transform = `translate3d( 
+        //     ${ players[playerId].x * pixel_size }px, ${ players[playerId].y * pixel_size }px, 0 
+        // )`;
     }
 
     const step = () => {
@@ -288,8 +444,12 @@ function generateMap(mapSize) {
         if (Object.keys(players)[0]) { // Player must be loaded in
             moveCharacter();
             setCamera();
+
+            if(players[playerId].adminPlayer) {
+                resourceHandler();
+            }
         };
-        
+
         requestAnimationFrame(() => { // Web browser calls this function every time a new frame begins
             step();
         })
@@ -297,10 +457,11 @@ function generateMap(mapSize) {
 
     function initGame() {
 
-        generateMap(30);
+        generateMap(MAP_SIZE);
 
         manageUnitCells();
         managePlayers(); // Returns the list of players
+        manageResources();
 
         step();
     }
@@ -326,10 +487,16 @@ function generateMap(mapSize) {
 				id: playerId,
 				name,
                 health: 10,
+                gold: 0,
+                wood: 0,
+                meat: 0,
 				direction: "right",
 				x,
 				y,
 			})
+
+            // Set player name on UI
+            document.querySelector(".player-name").innerText = name;
 
 			//Remove me from Firebase when I diconnect
 			playerRef.onDisconnect().remove();
