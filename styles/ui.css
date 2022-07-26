@@ -1,8 +1,126 @@
 .player-info {
+    position: absolute;
+    top: 0;
+    left:0;
+    padding: 1em;
+    display: flex;
+    gap: 0.5em;
+    align-items: flex-end;
+    color: white;
+}
+
+.player-stats {
+    padding: 1em;
+    display: flex;
+    gap: 0.5em;
+    align-items: flex-end;
+    color: white;
+}
+
+.spawn-menu {
+    padding: 1em;
+    display: flex;
+    gap: 0.5em;
+    align-items: flex-end;
+    color: white;
+}
+
+.player-info, .player-stats, .spawn-menu {
     font-size: 24px;
 }
 
 .player-name {
     font-weight: bold;
     font-size: 28px;
+
+    background: #333;
+    color: white;
+
+    text-transform: uppercase;
+    white-space: nowrap;
+
+    padding: 1px 2px 1px;
+    border-radius: 3px;
+}
+
+.player-reso-table, .player-stats-table, .player-spawn-table {
+    background: #333;
+    color: white;
+
+    white-space: nowrap;
+
+    padding: 0px 0px 0px;
+    border-radius: 6px;
+}
+
+.player-stats {
+    z-index: 2; 
+    position: absolute; 
+    right: 0px; 
+    top:0px;
+}
+
+.stat-upgrade-button {
+    background:none;
+    border:none;
+    margin:0;
+    padding:0;
+    cursor: pointer;
+    color: white;
+    font-size: 28px;
+    height: 30px;
+}
+
+.upg-cost-table {
+    font-size: 20px !important;
+    line-height: 1;
+}
+
+.spawn-villager-cost-table, .spawn-knight-cost-table {
+    text-align: center;
+}
+
+/* SPAWN TABLE */
+.spawn-menu {
+    z-index: 2; 
+    position: absolute; 
+    left: 0px; 
+    bottom:0px;
+}
+
+.spawn-table-img {
+    width: 64px;
+    height: 64px;
+    background-color: red;
+    margin: 5px;
+    
+}
+
+#villager-image.spawn-table-img {
+    background: url(/images/Unit/MedievalUnit_24.png) no-repeat no-repeat;
+    transform: scale(2);
+}
+
+#knight-image.spawn-table-img {
+    background: url(/images/Unit/MedievalUnit_03.png) no-repeat no-repeat;
+    transform: scale(2);
+}
+
+.player-spawn-table {
+    overflow: hidden;
+}
+
+.player-spawn-table-single-item {
+    background-color: #222;
+    padding: 0px 0px 0px;
+    border-radius: 6px;
+}
+
+.spawn-unit-button {
+    background:none;
+    border:none;
+    margin:0;
+    padding:0;
+    cursor: pointer;
+    color: white;
 }

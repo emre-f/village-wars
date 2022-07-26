@@ -47,17 +47,6 @@ body {
     overflow: hidden;
 }
 
-.player-info {
-    position: absolute;
-    top: 0;
-    left:0;
-    padding: 1em;
-    display: flex;
-    gap: 0.5em;
-    align-items: flex-end;
-    color: white;
-}
-
 /* was 160, 144 */
 .camera {
     width: calc(4px * var(--camera-width-multi));

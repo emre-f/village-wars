@@ -1,14 +1,22 @@
+:root {
+    --sprite-scale: 1;
+}
+
 .Resource_sprite[data-resource-type="wood"] {
     background: url(/images/Environment/medievalEnvironment_04.png);
+    transform: scale(var(--sprite-scale));
 }
 
 .Resource_sprite[data-resource-type="gold"] {
     background: url(/images/Environment/medievalEnvironment_12.png);
+    transform: scale(var(--sprite-scale));
 }
 
 .Resource_sprite[data-resource-type="meat"] {
+    --sprite-scale: 2;
+
     background: url(/images/Environment/medievalEnvironment_20.png);
-    transform: scale(2);
+    transform: scale(var(--sprite-scale));
 }
 
 .Resource_shadow {
@@ -21,7 +29,7 @@
 .Resource_amount-container {
     position: absolute;
     top: 0px;
-    left: 18px;
+    left: 20px;
     font-size: 6px;
     padding: 1px 2px 1px;
     border-radius: 3px;
@@ -31,4 +39,17 @@
     text-transform: uppercase;
     white-space: nowrap;
     transform: scale(2);
+}
+
+@keyframes shake {
+    0% { transform: translate3d(0, 0, 0) rotate(0deg) scale(var(--sprite-scale)) }
+    12.5% { transform: translate3d(-6%, 0, 0) rotate(5deg) scale(var(--sprite-scale)) }
+    25% { transform: translate3d(6%, 0, 0) rotate(-5deg) scale(var(--sprite-scale)) } 
+    37.5% { transform: translate3d(-3%, 0, 0) rotate(2.5deg) scale(var(--sprite-scale)) } 
+    50% { transform: translate3d(3%, 0, 0) rotate(-2.5deg) scale(var(--sprite-scale)) } 
+    100% { transform: translate3d(0, 0, 0) scale(var(--sprite-scale)) } 
+}
+
+.shake {
+    animation: shake 0.35s;
 }

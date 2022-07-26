@@ -1,4 +1,37 @@
 const MAP_SIZE = 30;
+const MAX_RESOURCE_ON_MAP = 80;
+var BASE_COLLECT_SPEED = 5;
+var BASE_VILLAGER_COLLECT_SPEED = 2;
+var PLAYER;
+
+let players = {};
+let playerId;
+let playerRef;
+let playerElements = {};
+
+let unitCells = {};
+let unitCellElements = {};
+
+let resources = {};
+let resourcesElements = {};
+
+let units = {};
+let unitElements = {};
+
+var unitMoveTimer = 1;
+var unitMoverTimerCD = 1;
+
+let knights = {};
+let knightElements = {};
+
+var knightMoveTimer = 1;
+var knightMoverTimerCD = 1;
+
+let archers = {};
+let archerElements = {};
+
+var archerMoveTimer = 1;
+var archerMoverTimerCD = 1;
 
 function generateMap(mapSize) {
     // Clear out old unit cells
@@ -24,17 +57,6 @@ function generateMap(mapSize) {
     const unitCellHolderElement = document.createElement("div");
     const resourcesHolderElement = document.createElement("div");
     const cameraElement = document.querySelector(".camera");
-
-    let players = {};
-    let playerId;
-    let playerRef;
-    let playerElements = {};
-
-    let unitCells = {};
-    let unitCellElements = {};
-
-    let resources = {};
-    let resourcesElements = {};
 
     // PLAYER MOVEMENT//start in the middle of the map
     var pixel_size;
@@ -123,41 +145,49 @@ function generateMap(mapSize) {
     function managePlayers() {
         const allPlayersRef = firebase.database().ref(`players`);
         allPlayersRef.on("value", (snapshot) => {
-    
             //Fires whenever a change occurs
             players = snapshot.val() || {};
         
             // ASSIGN ADMIN PLAYER
-
-            // If nobody is the admin player, assign it to him
-            let nobodyIsAdminPlayer = true;
-            for (let p in players) {
-                if(players[p].adminPlayer) {
-                    nobodyIsAdminPlayer = false;
+            if(Object.keys(players).includes(playerId)) {
+                // If nobody is the admin player, assign it to him
+                let nobodyIsAdminPlayer = true;
+                for (let p in players) {
+                    if(players[p].adminPlayer) {
+                        nobodyIsAdminPlayer = false;
+                    }
                 }
-            }
 
-            if (nobodyIsAdminPlayer) {
-                let newAdminPlayer = players[Object.keys(players)[0]];
-                console.log("New Admin Player: " + newAdminPlayer.name + " (ID: " + newAdminPlayer.id + ")");
+                if (nobodyIsAdminPlayer) {
+                    let newAdminPlayer = players[Object.keys(players)[0]];
 
-                var adminPlayerRef = firebase.database().ref(`players/${newAdminPlayer.id}`);
-                adminPlayerRef.update({
-                    adminPlayer : true,
-                })
+                    if(typeof newAdminPlayer.id !== 'undefined') {
+                        console.log("New Admin Player: " + newAdminPlayer.name + " (ID: " + newAdminPlayer.id + ")");
+
+                        firebase.database().ref(`players/${newAdminPlayer.id}`).update({
+                            adminPlayer : true,
+                        });
+                    }
+                }
             }
 
             Object.keys(players).forEach((key) => { // For each player...
                 const characterState = players[key];
                 let el = playerElements[key];
-                
+
+                if(typeof el === 'undefined' || typeof characterState === 'undefined') {
+                    console.log("ERROR HERE!")
+                    return;
+                }
+
                 // Now update the DOM
                 el.querySelector(".Character_name").innerText = characterState.name;
                 el.querySelector(".Character_health").innerText = characterState.health;
-                // el.setAttribute("data-color", characterState.color);
+                el.setAttribute("data-color", characterState.color);
+                el.setAttribute("data-body-type", characterState.bodyType);
                 el.setAttribute("data-direction", characterState.direction);
                 const left = 64 * characterState.x + "px";
-                const top = (64 * characterState.y - 16) + "px";
+                const top = (64 * characterState.y) + "px";
   
                 el.style.transform = `translate3d(${left}, ${top}, 0)`;
 
@@ -173,26 +203,77 @@ function generateMap(mapSize) {
                 let effectsContainer = "";
 
                 if(characterState.adminPlayer) {
-                    effectsContainer = effectsContainer + `<span class="Character_name-admin-player-container">&#128187;</span>`;
+                    effectsContainer = effectsContainer + `<span class="Character_name-admin-player-container">&#128217;</span>`;
+                }
+
+                // Remove your player if health is less than 0
+                if(characterState.health <= 0) {
+                    firebase.database().ref(`players/${characterState.id}`).remove();
                 }
 
                 if(el.getAttribute("you") === "true") {
                     effectsContainer = effectsContainer + `<span class="Character_you-container">&#128994;</span>`;
                     el.style.zIndex += 1; // If YOU are the player, be even more above
 
-                    // Remove your player if health is less than 0
-                    if(characterState.health <= 0) {
-                        playerRef.remove();
-                    }
-
                     // Update your stats on UI
                     document.querySelector(".player-health").innerText = characterState.health;
-                    document.querySelector(".player-gold").innerText = characterState.gold;
-                    document.querySelector(".player-wood").innerText = characterState.wood;
-                    document.querySelector(".player-meat").innerText = characterState.meat;
+                    document.querySelector(".player-gold").innerText = characterState.resources.gold;
+                    document.querySelector(".player-wood").innerText = characterState.resources.wood;
+                    document.querySelector(".player-meat").innerText = characterState.resources.meat;
+
+                    // Update your upgrades table
+                    updateAllUpgrades(characterState);
+
+                    // COUNT AI UNITS
+                    var currVillCount = 0
+                    var currKnightCount = 0
+
+                    Object.keys(units).forEach((key) => {
+                        if(units[key].ownerId === playerId) { currVillCount += 1; }
+                    })
+     
+                    Object.keys(knights).forEach((key) => {
+                        if(knights[key].ownerId === playerId) { currKnightCount += 1; }
+                    })
+
+                    playerRef.update( { 
+                        villagerUnitCount: currVillCount,
+                        knightUnitCount: currKnightCount, 
+                    } );
+
+                    // UPDATE UI
+                    document.querySelector(".curr-villager-count").innerText = characterState.villagerUnitCount;
+                    document.querySelector(".max-villager-count").innerText = characterState.maxVillagerUnitCount;
+                    document.querySelector(".curr-knight-count").innerText = characterState.knightUnitCount;
+                    document.querySelector(".max-knight-count").innerText = characterState.maxKnightUnitCount;
                 } 
 
                 el.querySelector(".Character_effects-container").innerHTML = effectsContainer;
+            })
+
+            // Go over each villager, if their owner isn't in the game remove them:
+            Object.keys(units).forEach((key) => {
+                const characterState = units[key];
+
+                if(!Object.keys(players).includes(characterState.ownerId)) {
+                    firebase.database().ref(`units/${key}`).remove()
+                }
+            })
+
+            Object.keys(knights).forEach((key) => {
+                const characterState = knights[key];
+
+                if(!Object.keys(players).includes(characterState.ownerId)) {
+                    firebase.database().ref(`knights/${key}`).remove()
+                }
+            })
+
+            Object.keys(archers).forEach((key) => {
+                const characterState = archers[key];
+
+                if(!Object.keys(players).includes(characterState.ownerId)) {
+                    firebase.database().ref(`archers/${key}`).remove()
+                }
             })
         })
     
@@ -220,16 +301,17 @@ function generateMap(mapSize) {
                     <span class="Character_health">0</span>
                 </div>
             `);
-    
+            console.log("added player id: ", addedPlayer.id)
             playerElements[addedPlayer.id] = characterElement;
     
             //Fill in some initial state
             characterElement.querySelector(".Character_name").innerText = addedPlayer.name;
             characterElement.querySelector(".Character_health").innerText = addedPlayer.health;
-            // characterElement.setAttribute("data-color", addedPlayer.color);
+            characterElement.setAttribute("data-color", addedPlayer.color);
+            characterElement.setAttribute("data-body-type", addedPlayer.bodyType);
             characterElement.setAttribute("data-direction", addedPlayer.direction);
             const left = 64 * addedPlayer.x + "px";
-            const top = 64 * addedPlayer.y - 16 + "px";
+            const top = 64 * addedPlayer.y + "px";
             characterElement.style.transform = `translate3d(${left}, ${top}, 0)`;
             gameContainer.appendChild(characterElement);
         })
@@ -245,6 +327,11 @@ function generateMap(mapSize) {
 
     function manageResources() {
         const allResourcesRef = firebase.database().ref(`resources`);
+
+        // Holds all unit cells
+        resourcesHolderElement.classList.add("resources-holder")
+        gameContainer.appendChild(resourcesHolderElement);
+
         allResourcesRef.on("value", (snapshot) => {
     
             //Fires whenever a change occurs
@@ -258,6 +345,13 @@ function generateMap(mapSize) {
                 // Now update the DOM
                 el.querySelector(".Resource_amount_left").innerText = resourceState.amountLeft;
                 el.querySelector(".Resource_amount_max").innerText = resourceState.amountMax;
+
+                // Show the amounts more faded when they are at max.
+                if (resourceState.amountLeft === resourceState.amountMax) {
+                    el.querySelector(".Resource_amount-container").style.opacity = 0.5;
+                } else {
+                    el.querySelector(".Resource_amount-container").style.opacity = 1;
+                }
 
                 // Lower characters should appear at the front!
                 el.style.zIndex = Math.round(resourceState.y / 16);
@@ -296,29 +390,354 @@ function generateMap(mapSize) {
             const top = 64 * addedResource.y + "px";
             resourceElement.style.transform = `translate3d(${left}, ${top}, 0)`;
 
+            // Show the amounts more faded when they are at max.
+            resourceElement.querySelector(".Resource_amount-container").style.opacity = 0.5;
+
             resourcesElements[key] = resourceElement;
-            gameContainer.appendChild(resourceElement);
+            resourcesHolderElement.appendChild(resourceElement);
         })
     
     
         //Remove character DOM element after they leave
         allResourcesRef.on("child_removed", (snapshot) => {
             const removedKey = getKeyString(snapshot.val().x, snapshot.val().y);
-            gameContainer.removeChild(resourcesElements[removedKey]);
+            resourcesHolderElement.removeChild(resourcesElements[removedKey]);
             delete resourcesElements[removedKey];
         })
     }
 
+    function manageUnits() {
+        const allUnitsRef = firebase.database().ref(`units`);
+        
+        allUnitsRef.on("value", (snapshot) => {
+            //Fires whenever a change occurs
+            units = snapshot.val() || {};
+        
+            Object.keys(units).forEach((key) => {
+                const characterState = units[key];
+                let el = unitElements[key];
+
+                // If villager has no health, remove them
+                if(characterState.health <= 0) {
+                    firebase.database().ref(`units/${key}`).remove()
+                    return
+                }
+
+                // Now update the DOM
+                el.querySelector(".Character_health").innerText = characterState.health;
+                el.setAttribute("data-direction", characterState.direction);
+                const left = 64 * characterState.x + "px";
+                const top = (64 * characterState.y) + "px";
+  
+                el.style.transform = `translate3d(${left}, ${top}, 0)`;
+
+                // Lower characters should appear at the front!
+                el.style.zIndex = Math.round(characterState.y / 16);
+
+                let effectsContainer = "";
+
+                // YOUR villager...
+                if(characterState.ownerId === playerId) {
+                    effectsContainer = effectsContainer + `<span class="Character_you-container">&#128994;</span>`;
+                } else {
+                    // Can put owner's name, I don't want to for now...
+
+                    // if(Object.keys(players)[0]) {
+                    //     let ownerName = players[characterState.ownerId].name;
+                    //     effectsContainer = effectsContainer + `<span class="Villager_owner_name" style="color: white;"> ${ownerName} </span>`;
+                    // }
+                }
+
+                el.querySelector(".Character_effects-container").innerHTML = effectsContainer;
+            })
+        })
+    
+        allUnitsRef.on("child_added", (snapshot) => {
+            //Fires whenever a new node is added the tree
+            const addedPlayer = snapshot.val();
+    
+            const characterElement = document.createElement("div");
+            characterElement.classList.add("Character", "grid-cell");
+    
+            characterElement.innerHTML = (`
+                <div class="Character_shadow grid-cell"></div>
+                <div class="Character_sprite grid-cell"></div>
+                <div class="Character_effects-container">
+                </div>
+                <div class="Character_name-container">
+                    <span class="Character_name"></span>
+                    <span class="Character_health">0</span>
+                </div>
+            `);
+    
+            unitElements[addedPlayer.id] = characterElement;
+    
+            //Fill in some initial state
+            characterElement.querySelector(".Character_name").innerText = addedPlayer.name;
+            characterElement.querySelector(".Character_health").innerText = addedPlayer.health;
+            characterElement.setAttribute("data-color", addedPlayer.color);
+            characterElement.setAttribute("data-body-type", addedPlayer.bodyType);
+            characterElement.setAttribute("data-direction", addedPlayer.direction);
+            const left = 64 * addedPlayer.x + "px";
+            const top = 64 * addedPlayer.y + "px";
+            characterElement.style.transform = `translate3d(${left}, ${top}, 0)`;
+            gameContainer.appendChild(characterElement);
+        })
+    
+    
+        //Remove character DOM element after they leave
+        allUnitsRef.on("child_removed", (snapshot) => {
+            const removedKey = snapshot.val().id;
+            gameContainer.removeChild(unitElements[removedKey]);
+            delete unitElements[removedKey];
+        })
+    }
+
+    function manageKnights() {
+        const allKnightsRef = firebase.database().ref(`knights`);
+
+        allKnightsRef.on("value", (snapshot) => {
+            //Fires whenever a change occurs
+            knights = snapshot.val() || {};
+        
+            Object.keys(knights).forEach((key) => {
+                const characterState = knights[key];
+                let el = knightElements[key];
+
+                // If knight has no health, remove them
+                if(characterState.health <= 0) {
+                    firebase.database().ref(`knights/${key}`).remove()
+                    return
+                }
+
+                // Now update the DOM
+                el.querySelector(".Character_health").innerText = characterState.health;
+                el.setAttribute("data-direction", characterState.direction);
+                const left = 64 * characterState.x + "px";
+                const top = (64 * characterState.y) + "px";
+  
+                el.style.transform = `translate3d(${left}, ${top}, 0)`;
+
+                // Lower characters should appear at the front!
+                el.style.zIndex = Math.round(characterState.y / 16);
+
+                let effectsContainer = "";
+
+                // YOUR knight...
+                if(characterState.ownerId === playerId) {
+                    effectsContainer = effectsContainer + `<span class="Character_you-container">&#128994;</span>`;
+                } else {
+                    // Can put owner's name, I don't want to for now...
+
+                    // if(Object.keys(players)[0]) {
+                    //     let ownerName = players[characterState.ownerId].name;
+                    //     effectsContainer = effectsContainer + `<span class="Villager_owner_name" style="color: white;"> ${ownerName} </span>`;
+                    // }
+                }
+
+                el.querySelector(".Character_effects-container").innerHTML = effectsContainer;
+            })
+        })
+    
+        allKnightsRef.on("child_added", (snapshot) => {
+            //Fires whenever a new node is added the tree
+            const addedPlayer = snapshot.val();
+    
+            const characterElement = document.createElement("div");
+            characterElement.classList.add("Character", "grid-cell");
+    
+            characterElement.innerHTML = (`
+                <div class="Character_shadow grid-cell"></div>
+                <div class="Character_sprite grid-cell"></div>
+                <div class="Character_effects-container">
+                </div>
+                <div class="Character_name-container">
+                    <span class="Character_name"></span>
+                    <span class="Character_health">0</span>
+                </div>
+            `);
+    
+            knightElements[addedPlayer.id] = characterElement;
+    
+            //Fill in some initial state
+            characterElement.querySelector(".Character_name").innerText = addedPlayer.name;
+            characterElement.querySelector(".Character_health").innerText = addedPlayer.health;
+            characterElement.setAttribute("data-color", addedPlayer.color);
+            characterElement.setAttribute("data-body-type", addedPlayer.bodyType);
+            characterElement.setAttribute("data-direction", addedPlayer.direction);
+            const left = 64 * addedPlayer.x + "px";
+            const top = 64 * addedPlayer.y + "px";
+            characterElement.style.transform = `translate3d(${left}, ${top}, 0)`;
+            gameContainer.appendChild(characterElement);
+        })
+    
+    
+        //Remove character DOM element after they leave
+        allKnightsRef.on("child_removed", (snapshot) => {
+            const removedKey = snapshot.val().id;
+            gameContainer.removeChild(knightElements[removedKey]);
+            delete knightElements[removedKey];
+        })
+    }
+
     function resourceHandler() {
+        var mapResourceAmount = Object.keys(resources).length;
 
         if(resourceSpawnTimer >= resourceSpawnTimerCD) {
-            spawnResources("wood");
-            spawnResources("gold");
-            spawnResources("meat");
+             
+            // console.log("There are ", mapResourceAmount, " resources on this map.");
+            if(mapResourceAmount < MAX_RESOURCE_ON_MAP) {
+                spawnResources("wood");
+                spawnResources("gold");+
+                spawnResources("meat");
+            }
 
             resourceSpawnTimer = 0;
         } else {
-            resourceSpawnTimer += 1/60;
+            // Spawn faster, the less resources there are
+            let multi = 1 + 2.5 * ((MAX_RESOURCE_ON_MAP - mapResourceAmount) / MAX_RESOURCE_ON_MAP);
+            // console.log("MULTI: ", multi);
+            resourceSpawnTimer += (1 * multi)/60;
+        }
+    }
+
+    function unitHandler() {
+        if(unitMoveTimer >= unitMoverTimerCD) {
+            if(resources.length === 0) { 
+                unitMoveTimer = 0;
+                return;
+            }
+
+            // Get all unit positions: (If there is a unit near a resource, don't go to it)
+            const allUnitPos = [];
+            Object.keys(units).forEach((key) => {
+                allUnitPos.push( { id: key, x: units[key].x, y: units[key].y } );
+            })
+
+            // Move your units
+            Object.keys(units).forEach((key) => {
+                const characterState = units[key];
+
+                // If this is YOUR villager, tell them their next move
+                if(characterState.ownerId === playerId) {
+                    // console.log("Controlling your villager");
+                    // Get the closest resource's position and walk towards it
+                    var closestResourcesPos = {};
+                    var closestDistance = Number.MAX_SAFE_INTEGER;
+
+                    Object.keys(resources).forEach((key) => {
+                        var skip = false;
+                        // If there is a unit near it, skip it
+                        for (let i = 0; i < allUnitPos.length; i++) {
+                            let dist = Math.abs(allUnitPos[i].x - resources[key].x) + Math.abs(allUnitPos[i].y - resources[key].y);
+     
+                            if (dist <= 3 && characterState.id !== allUnitPos[i].id) { // Shouldn't be the same villager...
+                                skip = true;
+                            }
+                        }
+
+                        if(skip) { return; }
+
+                        let dist = Math.abs(characterState.x - resources[key].x) + Math.abs(characterState.y - resources[key].y);
+                        if (dist < closestDistance) {
+                            closestDistance = dist;
+                            closestResourcesPos = { x: resources[key].x, y: resources[key].y }
+                        }
+                    });
+
+                    // Move
+                    if (characterState.x !== closestResourcesPos.x) {
+                        var dir = characterState.x > closestResourcesPos.x ? -1 : 1;
+                        moveUnit(characterState, {axis: "x", dir})
+                        
+                    } else {
+                        var dir = characterState.y > closestResourcesPos.y ? -1 : 1;
+                        moveUnit(characterState, {axis: "y", dir})
+                    }
+                }
+            })
+
+            unitMoveTimer = 0;
+        } else {
+            unitMoveTimer += 1/60;
+        }
+    }
+
+    function knightHandler() {
+        if(knightMoveTimer >= knightMoverTimerCD) {
+
+            // Get all positions: (If there is a unit near a resource, don't go to it)
+            const allPotentialTargetPos = [];
+
+            Object.keys(units).forEach((key) => {
+                if( units[key].ownerId === playerId) { return; }
+
+                allPotentialTargetPos.push( { x: units[key].x, y: units[key].y } );
+            })
+
+            Object.keys(players).forEach((key) => {
+                if( players[key].id === playerId) { return; }
+
+                allPotentialTargetPos.push( { x: players[key].x, y: players[key].y } );
+            })
+
+            Object.keys(knights).forEach((key) => {
+                if( knights[key].ownerId === playerId) { return; }
+
+                allPotentialTargetPos.push( { x: knights[key].x, y: knights[key].y } );
+            })
+            
+            Object.keys(archers).forEach((key) => {
+                if( archers[key].ownerId === playerId) { return; }
+
+                allPotentialTargetPos.push( { x: archers[key].x, y: archers[key].y } );
+            })
+
+            if(allPotentialTargetPos.length === 0) { // No target
+                knightMoveTimer = 0;
+                return;
+            }
+
+            // Move your knights
+            Object.keys(knights).forEach((key) => {
+                const characterState = knights[key];
+
+                // If this is YOUR knight, tell them their next move
+                if(characterState.ownerId === playerId) {
+                    // Get the closest resource's position and walk towards it
+                    var closestTargetPos = {};
+                    var closestDistance = Number.MAX_SAFE_INTEGER;
+
+                    for (let i = 0; i < allPotentialTargetPos.length; i++) {
+                        let dist = Math.abs(characterState.x - allPotentialTargetPos[i].x) + Math.abs(characterState.y - allPotentialTargetPos[i].y);
+                        if (dist < closestDistance) {
+                            closestDistance = dist;
+                            closestTargetPos = { x: allPotentialTargetPos[i].x, y: allPotentialTargetPos[i].y }
+                        }
+                    }
+
+                    // Move
+                    if (characterState.x !== closestTargetPos.x && characterState.y !== closestTargetPos.y) {
+                        if(Math.random() < 0.5) {
+                            var dir = characterState.x > closestTargetPos.x ? -1 : 1;
+                            moveKnight(characterState, {axis: "x", dir})
+                        } else {
+                            var dir = characterState.y > closestTargetPos.y ? -1 : 1;
+                            moveKnight(characterState, {axis: "y", dir})
+                        }
+                    } else if (characterState.x !== closestTargetPos.x) {
+                        var dir = characterState.x > closestTargetPos.x ? -1 : 1;
+                        moveKnight(characterState, {axis: "x", dir})
+                    } else {
+                        var dir = characterState.y > closestTargetPos.y ? -1 : 1;
+                        moveKnight(characterState, {axis: "y", dir})
+                    }
+                }
+            })
+
+            knightMoveTimer = 0;
+        } else {
+            knightMoveTimer += 1/60;
         }
     }
 
@@ -350,13 +769,14 @@ function generateMap(mapSize) {
             }
         }
 
+        let chosenAmount = randomFromArray([120, 180, 360]);
         const resourceRef = firebase.database().ref(`resources/${getKeyString(lastPos.x, lastPos.y)}`);
         resourceRef.set({
             type: type,
             x: lastPos.x,
             y: lastPos.y,
-            amountLeft: 100,
-            amountMax: 100,
+            amountLeft: chosenAmount,
+            amountMax: chosenAmount,
         })
     }
 
@@ -379,28 +799,100 @@ function generateMap(mapSize) {
             if (held_direction === directions.down) {newY += speed;}
             if (held_direction === directions.up) {newY -= speed;}
 
+            // Check if position is out of bounds
+            if (newX < 0 || newX >= MAP_SIZE || newY < 0 || newY >= MAP_SIZE) { 
+                return
+            };
+
             // Check if new position is occupied
             var hitTarget = isOccupiedByPlayer(newX, newY, players)
             
             if(hitTarget) {
-                firebase.database().ref(`players/${hitTarget.id}`).update({ health: hitTarget.health - 1 });
+                firebase.database().ref(`players/${hitTarget.id}`).update({ health: hitTarget.health - PLAYER.damage });
+                return;
+            }
+
+            var hitUnit = isOccupiedByPlayer(newX, newY, units)
+
+            if (hitUnit) {
+                if (hitUnit.ownerId !== playerId) { // If not your unit, damage it
+                    firebase.database().ref(`units/${hitUnit.id}`).update({ health: hitUnit.health - PLAYER.damage });
+                } 
+        
+                return;
+            }
+
+            var hitKnight = isOccupiedByPlayer(newX, newY, knights)
+
+            if (hitKnight) {
+                if (hitKnight.ownerId !== playerId) { // If not your unit, damage it
+                    firebase.database().ref(`knights/${hitKnight.id}`).update({ health: hitKnight.health - PLAYER.damage });
+                } 
+        
+                return;
+            }
+
+            var hitArcher = isOccupiedByPlayer(newX, newY, archers)
+
+            if (hitArcher) {
+                if (hitArcher.ownerId !== playerId) { // If not your unit, damage it
+                    firebase.database().ref(`archers/${hitArcher.id}`).update({ health: hitArcher.health - PLAYER.damage });
+                } 
+        
                 return;
             }
 
             var hitResource = isOccupiedByPlayer(newX, newY, resources)
 
             if(hitResource) {
-                firebase.database().ref(`resources/${getKeyString(hitResource.x, hitResource.y)}`).update( { amountLeft: hitResource.amountLeft - 10 } );
+                var remove_amount = BASE_COLLECT_SPEED;
                 var plyr = players[playerId];
-   
+                var targetEle = resourcesElements[getKeyString(hitResource.x, hitResource.y)];
+
+                // Shake the hit resource
+                if (typeof targetEle !== 'undefined') {
+                    targetEle.querySelector(".Resource_sprite").classList.add("shake");
+                    setTimeout(() => {
+                        targetEle.querySelector(".Resource_sprite").classList.remove("shake");
+                    }, 350)
+                }
+                
                 // Give yourself the resource
                 if(hitResource.type === "wood") {
-                    playerRef.update( { wood: plyr.wood + 10 } )
+                    remove_amount += 2 * plyr.stats.chopLevel;
+
+                    playerRef.update( { 
+                        resources: { 
+                            gold: plyr.resources.gold,
+                            wood: plyr.resources.wood + Math.min(remove_amount, hitResource.amountLeft),
+                            meat: plyr.resources.meat
+                        } 
+                    } )
                 } else if(hitResource.type === "gold") {
-                    playerRef.update( { gold: plyr.gold + 10 } )
+                    remove_amount += 2 * plyr.stats.mineLevel;
+
+                    playerRef.update( { 
+                        resources: { 
+                            gold: plyr.resources.gold + Math.min(remove_amount, hitResource.amountLeft),
+                            wood: plyr.resources.wood,
+                            meat: plyr.resources.meat
+                        } 
+                    } )
                 } else if(hitResource.type === "meat") {
-                    playerRef.update( { meat: plyr.meat + 10 } )
+                    remove_amount += 2 * plyr.stats.huntLevel;
+
+                    playerRef.update( { 
+                        resources: { 
+                            gold: plyr.resources.gold,
+                            wood: plyr.resources.wood,
+                            meat: plyr.resources.meat + remove_amount
+                        } 
+                    } )
                 }
+
+                firebase.database().ref(`resources/${getKeyString(hitResource.x, hitResource.y)}`).update( { 
+                    amountLeft: hitResource.amountLeft - Math.min(remove_amount, hitResource.amountLeft)
+                } );
 
                 return;
             }
@@ -412,6 +904,188 @@ function generateMap(mapSize) {
             players[playerId].y = newY;
             playerRef.set(players[playerId]);
         }
+    }
+
+    function moveUnit(characterState, way, reTry = true) {
+
+        const unitRef = firebase.database().ref(`units/${characterState.id}`);
+
+        // Move toward the resource
+        var newPos = {};
+        if (way.axis === "x") {
+            newPos = { 
+                x: characterState.x + way.dir, 
+                y: characterState.y };
+        } else if (way.axis === "y") {
+            newPos = { 
+                x: characterState.x, 
+                y: characterState.y + way.dir 
+            };
+        }
+
+        // If you are hitting a player OR unit OR out of bounds return
+        if(isOccupiedByPlayer(newPos.x, newPos.y, players) || 
+           isOccupiedByPlayer(newPos.x, newPos.y, units) ||
+           isOccupiedByPlayer(newPos.x, newPos.y, knights) ||
+           isOccupiedByPlayer(newPos.x, newPos.y, archers)) {
+            if(reTry) {
+                let newWay = { 
+                    axis: (way.axis === "x") ? "y" : "x", 
+                    dir: (Math.random()>=0.5)? 1 : -1
+                }
+                moveUnit(characterState, newWay, false); // Attempt to move in a different direction
+            }
+            
+            return;
+        }
+
+        if (newPos.x < 0 || newPos.x >= MAP_SIZE || newPos.y < 0 || newPos.y >= MAP_SIZE) { 
+            return
+        };
+
+        // Check if we are hitting a new resource
+        var hitResource = isOccupiedByPlayer(newPos.x, newPos.y, resources)
+
+        if(hitResource) {
+            var remove_amount = BASE_VILLAGER_COLLECT_SPEED;
+            var plyr = players[characterState.ownerId];
+            var targetEle = resourcesElements[getKeyString(hitResource.x, hitResource.y)];
+
+            // Shake the hit resource
+            if (typeof targetEle !== 'undefined') {
+                targetEle.querySelector(".Resource_sprite").classList.add("shake");
+                setTimeout(() => {
+                    targetEle.querySelector(".Resource_sprite").classList.remove("shake");
+                }, 350)
+            }
+            
+            // Give yourself the resource
+            if(hitResource.type === "wood") {
+                remove_amount += plyr.stats.chopLevel;
+
+                playerRef.update( { 
+                    resources: { 
+                        gold: plyr.resources.gold,
+                        wood: plyr.resources.wood + Math.min(remove_amount, hitResource.amountLeft),
+                        meat: plyr.resources.meat
+                    } 
+                } )
+            } else if(hitResource.type === "gold") {
+                remove_amount += plyr.stats.mineLevel;
+
+                playerRef.update( { 
+                    resources: { 
+                        gold: plyr.resources.gold + Math.min(remove_amount, hitResource.amountLeft),
+                        wood: plyr.resources.wood,
+                        meat: plyr.resources.meat
+                    } 
+                } )
+            } else if(hitResource.type === "meat") {
+                remove_amount += plyr.stats.huntLevel;
+
+                playerRef.update( { 
+                    resources: { 
+                        gold: plyr.resources.gold,
+                        wood: plyr.resources.wood,
+                        meat: plyr.resources.meat + remove_amount
+                    } 
+                } )
+            }
+
+            firebase.database().ref(`resources/${getKeyString(hitResource.x, hitResource.y)}`).update( { 
+                amountLeft: hitResource.amountLeft - Math.min(remove_amount, hitResource.amountLeft)
+            } );
+        } else {
+            // Not hitting a resource... move
+            unitRef.update({ x: newPos.x, y: newPos.y });
+        }
+    }
+
+    function moveKnight(characterState, way, reTry = true) {
+        const knightRef = firebase.database().ref(`knights/${characterState.id}`);
+
+        function reTryMove () {
+            if(reTry) {
+                let newWay = { 
+                    axis: (way.axis === "x") ? "y" : "x", 
+                    dir: (Math.random()>=0.5)? 1 : -1
+                }
+
+                moveKnight(characterState, newWay, false); // Attempt to move in a different direction
+            } 
+        }
+
+        // Move toward the target
+        var newPos = {};
+        if (way.axis === "x") {
+            newPos = { 
+                x: characterState.x + way.dir, 
+                y: characterState.y };
+        } else if (way.axis === "y") {
+            newPos = { 
+                x: characterState.x, 
+                y: characterState.y + way.dir 
+            };
+        }
+
+        if (newPos.x < 0 || newPos.x >= MAP_SIZE || newPos.y < 0 || newPos.y >= MAP_SIZE) { 
+            return
+        };
+
+        var plyr = players[characterState.ownerId];
+        var dmg = characterState.damage + plyr.stats.attackLevel;
+
+        // Check if new position is occupied
+        var hitTarget = isOccupiedByPlayer(newPos.x, newPos.y, players)
+            
+        if(hitTarget) {
+            if(hitTarget.id === characterState.ownerId) { 
+                reTryMove();  
+            } else {
+                firebase.database().ref(`players/${hitTarget.id}`).update({ health: hitTarget.health - dmg });
+            }
+
+            return;
+        }
+
+        var hitUnit = isOccupiedByPlayer(newPos.x, newPos.y, units)
+
+        if (hitUnit) {
+            if (hitUnit.ownerId === characterState.ownerId) { 
+                reTryMove();
+            } else { // If not your unit, damage it
+                firebase.database().ref(`units/${hitUnit.id}`).update({ health: hitUnit.health - dmg });
+            }
+    
+            return;
+        }
+
+        var hitKnight = isOccupiedByPlayer(newPos.x, newPos.y, knights)
+
+        if (hitKnight) {
+            if (hitKnight.ownerId === characterState.ownerId) { 
+                reTryMove();
+            } else {
+                firebase.database().ref(`knights/${hitKnight.id}`).update({ health: hitKnight.health - dmg });
+            }
+    
+            return;
+        }
+
+        var hitArcher = isOccupiedByPlayer(newPos.x, newPos.y, archers)
+
+        if (hitArcher) {
+            if (hitArcher.ownerId === playerId) { // If not your unit, damage it
+                reTryMove();
+            } else {
+                firebase.database().ref(`archers/${hitArcher.id}`).update({ health: hitArcher.health - dmg });
+            }
+    
+            return;
+        }
+            
+        // Not hitting anything... move
+        knightRef.update( { x: newPos.x, y: newPos.y } );
     }
 
     function setCamera() {
@@ -430,25 +1104,33 @@ function generateMap(mapSize) {
         gameContainer.style.transform = `translate3d( 
             ${ -players[playerId].x * pixel_size * 16 + camera_left }px, ${ -players[playerId].y * pixel_size * 16 + camera_top }px, 0 
         )`;
-
+        
+        // NOW SETTING PLAYER POSITION IN MANAGE PLAYER
         // playerElements[playerId].style.transform = `translate3d( 
         //     ${ players[playerId].x * pixel_size }px, ${ players[playerId].y * pixel_size }px, 0 
         // )`;
     }
 
     const step = () => {
+
         pixel_size = parseInt(
             getComputedStyle(document.documentElement).getPropertyValue('--pixel-size')
         );
 
-        if (Object.keys(players)[0]) { // Player must be loaded in
+        if (Object.keys(players).includes(playerId)) { // Player must be loaded in
             moveCharacter();
             setCamera();
 
             if(players[playerId].adminPlayer) {
                 resourceHandler();
             }
+            
+            unitHandler();
+            knightHandler();
+            //archerHandler();
         };
+
+        PLAYER = players[playerId];
 
         requestAnimationFrame(() => { // Web browser calls this function every time a new frame begins
             step();
@@ -462,47 +1144,100 @@ function generateMap(mapSize) {
         manageUnitCells();
         managePlayers(); // Returns the list of players
         manageResources();
+        manageUnits();
+        manageKnights();
+
+        setupUpgradeButtons();
+        setupSpawnButtons();
 
         step();
     }
     
 
     firebase.auth().onAuthStateChanged((user) => {
-		console.log(user)
+        var checkPlayers = setInterval(function(){
+            if(Object.keys(players).includes(playerId)) {
+
+                Object.keys(units).forEach((key) => {
+                    const characterState = units[key];
+                    if(characterState.ownerId === user.uid) {
+                        firebase.database().ref(`units/${key}`).remove()
+                    }
+                })
+
+                Object.keys(knights).forEach((key) => {
+                    const characterState = knights[key];
+                    if(characterState.ownerId === user.uid) {
+                        firebase.database().ref(`knights/${key}`).remove()
+                    }
+                })
+
+                Object.keys(archers).forEach((key) => {
+                    const characterState = archers[key];
+                    if(characterState.ownerId === user.uid) {
+                        firebase.database().ref(`archers/${key}`).remove()
+                    }
+                })
+
+                clearInterval(checkPlayers);
+            }
+        }, 10);
+
 		if (user) {
 			//You're logged in!
 			playerId = user.uid;
-			playerRef = firebase.database().ref(`players/${playerId}`);
             
             // Initial player name
-			const name = createName();
+            const bodyType = 3; // The king body type
+            const name = createName(bodyType);
 
             // The name inputting area, not used yet
 			// playerNameInput.value = name;
 
             // Spawn position
-			const { x, y } = { x: 0, y: 0 };
+            // Wait 500ms for the resources from server to load (we need to check positions to stop overlap!)
+            setTimeout(() => {
+                playerRef = firebase.database().ref(`players/${playerId}`);
+                const { x, y } = getRandomSafeSpot();
 
-			playerRef.set({
-				id: playerId,
-				name,
-                health: 10,
-                gold: 0,
-                wood: 0,
-                meat: 0,
-				direction: "right",
-				x,
-				y,
-			})
+                playerRef.set({
+                    id: playerId,
+                    name,
+                    health: 100,
+                    damage: 10,
+                    resources: {
+                        gold: 0,
+                        wood: 0,
+                        meat: 0,
+                    },
+                    stats: {
+                        healthLevel: 0,
+                        attackLevel: 0,
+                        mineLevel: 0,
+                        chopLevel: 0,
+                        huntLevel: 0,
+                    },
+                    villagerUnitCount: 0,
+                    maxVillagerUnitCount: 3,
+                    knightUnitCount: 0,
+                    maxKnightUnitCount: 3,
+                    color: randomFromArray(["blue", "orange", "green", "gray"]),
+                    bodyType,
+                    x,
+                    y,
+                })
 
-            // Set player name on UI
-            document.querySelector(".player-name").innerText = name;
+                // Set player name on UI
+                document.querySelector(".player-name").innerText = name;
 
-			//Remove me from Firebase when I diconnect
-			playerRef.onDisconnect().remove();
+                //Remove me from Firebase when I diconnect
+                playerRef.onDisconnect().remove();
 
-			//Begin the game now that we are signed in
-			initGame();
+            }, 500);
+
+            //Begin the game now that we are signed in
+            initGame();
+
 		} else {
 			//You're logged out.
 		}
