@@ -3,24 +3,24 @@
 }
 
 .Resource_sprite[data-resource-type="wood"] {
-    background: url(/images/Environment/medievalEnvironment_04.png);
+    background: url(../images/Environment/medievalEnvironment_04.png);
     transform: scale(var(--sprite-scale));
 }
 
 .Resource_sprite[data-resource-type="gold"] {
-    background: url(/images/Environment/medievalEnvironment_12.png);
+    background: url(../images/Environment/medievalEnvironment_12.png);
     transform: scale(var(--sprite-scale));
 }
 
 .Resource_sprite[data-resource-type="meat"] {
     --sprite-scale: 2;
 
-    background: url(/images/Environment/medievalEnvironment_20.png);
+    background: url(../images/Environment/medievalEnvironment_20.png);
     transform: scale(var(--sprite-scale));
 }
 
 .Resource_shadow {
-    background: url(/images/Unit/shadow.png) no-repeat no-repeat;
+    background: url(../images/Unit/shadow.png) no-repeat no-repeat;
     transform: scale(2);
     top: 55px;
     left: 45px;
