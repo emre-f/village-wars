@@ -1,5 +1,3 @@
-GOD_MODE = true;
-
 function updateAllUpgrades (characterState) {
     if (typeof characterState === 'undefined') {
         console.log("Character state is undefined.");
