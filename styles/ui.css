@@ -96,14 +96,17 @@
     
 }
 
+.spawn-table-img {
+    transform: scale(2);
+    image-rendering: pixelated;
+}
+
 #villager-image.spawn-table-img {
     background: url(../images/Unit/medievalUnit_24.png) no-repeat no-repeat;
-    transform: scale(2);
 }
 
 #knight-image.spawn-table-img {
     background: url(../images/Unit/medievalUnit_03.png) no-repeat no-repeat;
-    transform: scale(2);
 }
 
 .player-spawn-table {
