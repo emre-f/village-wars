@@ -23,74 +23,74 @@
 
 /* BLUE MALE */
 .Character[data-color="blue"][data-body-type="1"] .Character_sprite {
-    background: url(../images/Unit/medievalUnit_24.png);
+    background: url(images/Unit/medievalUnit_24.png);
 }
 /* BLUE FEMALE */
 .Character[data-color="blue"][data-body-type="2"] .Character_sprite {
-    background: url(../images/Unit/medievalUnit_23.png);
+    background: url(images/Unit/medievalUnit_23.png);
 }
 /* BLUE KING */
 .Character[data-color="blue"][data-body-type="3"] .Character_sprite {
-    background: url(../images/Unit/medievalUnit_04.png);
+    background: url(images/Unit/medievalUnit_04.png);
 }
 /* BLUE KNIGHT */
 .Character[data-color="blue"][data-body-type="4"] .Character_sprite {
-    background: url(../images/Unit/medievalUnit_03.png);
+    background: url(images/Unit/medievalUnit_03.png);
 }
 
 /* ORANGE MALE */
 .Character[data-color="orange"][data-body-type="1"] .Character_sprite {
-    background: url(../images/Unit/medievalUnit_06.png);
+    background: url(images/Unit/medievalUnit_06.png);
 }
 /* ORANGE FEMALE */
 .Character[data-color="orange"][data-body-type="2"] .Character_sprite {
-    background: url(../images/Unit/medievalUnit_05.png);
+    background: url(images/Unit/medievalUnit_05.png);
 }
 /* ORANGE KING */
 .Character[data-color="orange"][data-body-type="3"] .Character_sprite {
-    background: url(../images/Unit/medievalUnit_10.png);
+    background: url(images/Unit/medievalUnit_10.png);
 }
 /* ORANGE KNIGHT */
 .Character[data-color="orange"][data-body-type="4"] .Character_sprite {
-    background: url(../images/Unit/medievalUnit_09.png);
+    background: url(images/Unit/medievalUnit_09.png);
 }
 
 /* GREEN MALE */
 .Character[data-color="green"][data-body-type="1"] .Character_sprite {
-    background: url(../images/Unit/medievalUnit_12.png);
+    background: url(images/Unit/medievalUnit_12.png);
 }
 /* GREEN FEMALE */
 .Character[data-color="green"][data-body-type="2"] .Character_sprite {
-    background: url(../images/Unit/medievalUnit_11.png);
+    background: url(images/Unit/medievalUnit_11.png);
 }
 /* GREEN KING */
 .Character[data-color="green"][data-body-type="3"] .Character_sprite {
-    background: url(../images/Unit/medievalUnit_16.png);
+    background: url(images/Unit/medievalUnit_16.png);
 }
 /* GREEN KNIGHT */
 .Character[data-color="green"][data-body-type="4"] .Character_sprite {
-    background: url(../images/Unit/medievalUnit_15.png);
+    background: url(images/Unit/medievalUnit_15.png);
 }
 
 /* GRAY MALE */
 .Character[data-color="gray"][data-body-type="1"] .Character_sprite {
-    background: url(../images/Unit/medievalUnit_18.png);
+    background: url(images/Unit/medievalUnit_18.png);
 }
 /* GRAY FEMALE */
 .Character[data-color="gray"][data-body-type="2"] .Character_sprite {
-    background: url(../images/Unit/medievalUnit_17.png);
+    background: url(images/Unit/medievalUnit_17.png);
 }
 /* GRAY KING */
 .Character[data-color="gray"][data-body-type="3"] .Character_sprite {
-    background: url(../images/Unit/medievalUnit_22.png);
+    background: url(images/Unit/medievalUnit_22.png);
 }
 /* GRAY KNIGHT */
 .Character[data-color="gray"][data-body-type="4"] .Character_sprite {
-    background: url(../images/Unit/medievalUnit_21.png);
+    background: url(images/Unit/medievalUnit_21.png);
 }
 
 .Character_shadow {
-    background: url(../images/Unit/shadow.png) no-repeat no-repeat;
+    background: url(images/Unit/shadow.png) no-repeat no-repeat;
     transform: scale(3);
     top: 80px;
     left: 70px;
