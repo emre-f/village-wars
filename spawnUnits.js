@@ -114,13 +114,13 @@ function spawnKnightAt(spawnPos) {
 
 // SPAWN COSTS
 const villagerSpawnCost = {
-	goldCost: 40,
-	woodCost: 40,
-	meatCost: 100,
+	goldCost: 30,
+	woodCost: 30,
+	meatCost: 80,
 }
 
 const knightSpawnCost = {
-    goldCost: 100,
-    woodCost: 100,
-    meatCost: 100
+    goldCost: 80,
+    woodCost: 80,
+    meatCost: 80
 }
