@@ -1,4 +1,4 @@
-.sword-slash {
+.sword-slash, .fireball {
     position: absolute;
     width: 32px;
     height: 32px;
@@ -46,4 +46,19 @@
 @keyframes sword-slash-effect-down {
     0% { opacity: 1; transform: scale(1) translate3d(0, 0, 0) rotate(90deg) }
     100% { opacity: 0.4; transform: scale(2) translate3d(0, 15px, 0) rotate(90deg) } 
+}
+
+/* FIREBALL */
+.fireball-animation-sprite {
+    background: url(../images/Effects/fireball.png);
+    image-rendering: pixelated;
+    width: 32px;
+    height: 32px;
+
+    animation: fireball-animation 0.35s normal forwards;
+}
+
+@keyframes fireball-animation {
+    0% { opacity: 1; transform: scale(1) translate3d(0, 0, 0) }
+    100% { opacity: 0.4; transform: scale(1) translate3d(var(--target-left), var(--target-top), 0) } 
 }

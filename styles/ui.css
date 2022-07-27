@@ -109,6 +109,10 @@
     background: url(../images/Unit/medievalUnit_03.png) no-repeat no-repeat;
 }
 
+#mage-image.spawn-table-img {
+    background: url(../images/Unit/medievalUnit_01.png) no-repeat no-repeat;
+}
+
 .player-spawn-table {
     overflow: hidden;
 }

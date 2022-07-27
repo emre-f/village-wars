@@ -27,40 +27,45 @@ function setupUpgradeButtons () {
            {
             if(PLAYER.stats.healthLevel === 10) { return; }
 
-            firebase.database().ref(`players/${PLAYER.id}`).update({ 
-                health: PLAYER.health + 20,
-                resources: {
-                    gold: PLAYER.resources.gold - costs.goldCost,
-                    wood: PLAYER.resources.wood - costs.woodCost,
-                    meat: PLAYER.resources.meat - costs.meatCost,
-                },
-                stats: {
-                    healthLevel: PLAYER.stats.healthLevel + 1,
-                    attackLevel: PLAYER.stats.attackLevel,
-                    mineLevel: PLAYER.stats.mineLevel,
-                    chopLevel: PLAYER.stats.chopLevel,
-                    huntLevel: PLAYER.stats.huntLevel,
-                } 
+            firebase.database().ref(`players/${PLAYER.id}`).transaction((obj) => {
+                obj.health = obj.health + 20,
+                obj.resources = {
+                    gold: obj.resources.gold - costs.goldCost,
+                    wood: obj.resources.wood - costs.woodCost,
+                    meat: obj.resources.meat - costs.meatCost,
+                }
+                obj.stats = {
+                    healthLevel: obj.stats.healthLevel + 1,
+                    attackLevel: obj.stats.attackLevel,
+                    mineLevel: obj.stats.mineLevel,
+                    chopLevel: obj.stats.chopLevel,
+                    huntLevel: obj.stats.huntLevel,
+                }
+
+                return obj
             });
         }
 
         // Buff health of all villagers and other units as well
         Object.keys(units).forEach((key) => {
-            firebase.database().ref(`units/${key}`).update({ 
-                health: units[key].health + 2,
-            })
+            firebase.database().ref(`units/${key}`).transaction((obj) => {
+                obj.health = obj.health + 3
+                return obj
+            });
         })
 
         Object.keys(knights).forEach((key) => {
-            firebase.database().ref(`knights/${key}`).update({ 
-                health: knights[key].health + 5,
-            })
+            firebase.database().ref(`knights/${key}`).transaction((obj) => {
+                obj.health = obj.health + 7
+                return obj
+            });
         })
 
-        Object.keys(archers).forEach((key) => {
-            firebase.database().ref(`archers/${key}`).update({ 
-                health: archers[key].health + 3,
-            })
+        Object.keys(mages).forEach((key) => {
+            firebase.database().ref(`mages/${key}`).transaction((obj) => {
+                obj.health = obj.health + 3
+                return obj
+            });
         })
     })
 
@@ -75,20 +80,22 @@ function setupUpgradeButtons () {
            {
             if(PLAYER.stats.attackLevel === 10) { return; }
 
-            firebase.database().ref(`players/${PLAYER.id}`).update({ 
-                damage: PLAYER.damage + 2,
-                resources: {
-                    gold: PLAYER.resources.gold - costs.goldCost,
-                    wood: PLAYER.resources.wood - costs.woodCost,
-                    meat: PLAYER.resources.meat - costs.meatCost,
-                },
-                stats: {
-                    healthLevel: PLAYER.stats.healthLevel,
-                    attackLevel: PLAYER.stats.attackLevel + 1,
-                    mineLevel: PLAYER.stats.mineLevel,
-                    chopLevel: PLAYER.stats.chopLevel,
-                    huntLevel: PLAYER.stats.huntLevel,
-                } 
+            firebase.database().ref(`players/${PLAYER.id}`).transaction((obj) => {
+                obj.damage = obj.damage + 2,
+                obj.resources = {
+                    gold: obj.resources.gold - costs.goldCost,
+                    wood: obj.resources.wood - costs.woodCost,
+                    meat: obj.resources.meat - costs.meatCost,
+                }
+                obj.stats = {
+                    healthLevel: obj.stats.healthLevel,
+                    attackLevel: obj.stats.attackLevel + 1,
+                    mineLevel: obj.stats.mineLevel,
+                    chopLevel: obj.stats.chopLevel,
+                    huntLevel: obj.stats.huntLevel,
+                }
+
+                return obj
             });
         }
     })
@@ -103,19 +110,22 @@ function setupUpgradeButtons () {
            {
             if(PLAYER.stats.mineLevel === 10) { return; }
 
-            firebase.database().ref(`players/${PLAYER.id}`).update({ 
-                resources: {
-                    gold: PLAYER.resources.gold,
-                    wood: PLAYER.resources.wood - costs.woodCost,
-                    meat: PLAYER.resources.meat - costs.meatCost,
-                },
-                stats: {
-                    healthLevel: PLAYER.stats.healthLevel,
-                    attackLevel: PLAYER.stats.attackLevel,
-                    mineLevel: PLAYER.stats.mineLevel + 1,
-                    chopLevel: PLAYER.stats.chopLevel,
-                    huntLevel: PLAYER.stats.huntLevel,
-                } 
+            firebase.database().ref(`players/${PLAYER.id}`).transaction((obj) => {
+                obj.damage = obj.damage + 2,
+                obj.resources = {
+                    gold: obj.resources.gold,
+                    wood: obj.resources.wood - costs.woodCost,
+                    meat: obj.resources.meat - costs.meatCost,
+                }
+                obj.stats = {
+                    healthLevel: obj.stats.healthLevel,
+                    attackLevel: obj.stats.attackLevel,
+                    mineLevel: obj.stats.mineLevel + 1,
+                    chopLevel: obj.stats.chopLevel,
+                    huntLevel: obj.stats.huntLevel,
+                }
+
+                return obj
             });
         }
     })
@@ -130,19 +140,22 @@ function setupUpgradeButtons () {
            {
             if(PLAYER.stats.chopLevel === 10) { return; }
 
-            firebase.database().ref(`players/${PLAYER.id}`).update({ 
-                resources: {
-                    gold: PLAYER.resources.gold - costs.goldCost,
-                    wood: PLAYER.resources.wood,
-                    meat: PLAYER.resources.meat - costs.meatCost,
-                },
-                stats: {
-                    healthLevel: PLAYER.stats.healthLevel,
-                    attackLevel: PLAYER.stats.attackLevel,
-                    mineLevel: PLAYER.stats.mineLevel,
-                    chopLevel: PLAYER.stats.chopLevel + 1,
-                    huntLevel: PLAYER.stats.huntLevel,
-                } 
+            firebase.database().ref(`players/${PLAYER.id}`).transaction((obj) => {
+                obj.damage = obj.damage + 2,
+                obj.resources = {
+                    gold: obj.resources.gold - costs.goldCost,
+                    wood: obj.resources.wood,
+                    meat: obj.resources.meat - costs.meatCost,
+                }
+                obj.stats = {
+                    healthLevel: obj.stats.healthLevel,
+                    attackLevel: obj.stats.attackLevel,
+                    mineLevel: obj.stats.mineLevel,
+                    chopLevel: obj.stats.chopLevel + 1,
+                    huntLevel: obj.stats.huntLevel,
+                }
+
+                return obj
             });
         }
     })
@@ -157,19 +170,22 @@ function setupUpgradeButtons () {
            {
             if(PLAYER.stats.huntLevel === 10) { return; }
 
-            firebase.database().ref(`players/${PLAYER.id}`).update({ 
-                resources: {
-                    gold: PLAYER.resources.gold - costs.goldCost,
-                    wood: PLAYER.resources.wood - costs.woodCost,
-                    meat: PLAYER.resources.meat,
-                },
-                stats: {
-                    healthLevel: PLAYER.stats.healthLevel,
-                    attackLevel: PLAYER.stats.attackLevel,
-                    mineLevel: PLAYER.stats.mineLevel,
-                    chopLevel: PLAYER.stats.chopLevel,
-                    huntLevel: PLAYER.stats.huntLevel + 1,
-                } 
+            firebase.database().ref(`players/${PLAYER.id}`).transaction((obj) => {
+                obj.damage = obj.damage + 2,
+                obj.resources = {
+                    gold: obj.resources.gold - costs.goldCost,
+                    wood: obj.resources.wood - costs.woodCost,
+                    meat: obj.resources.meat,
+                }
+                obj.stats = {
+                    healthLevel: obj.stats.healthLevel,
+                    attackLevel: obj.stats.attackLevel,
+                    mineLevel: obj.stats.mineLevel,
+                    chopLevel: obj.stats.chopLevel,
+                    huntLevel: obj.stats.huntLevel + 1,
+                }
+
+                return obj
             });
         }
     })

@@ -37,6 +37,10 @@
 .Character[data-color="blue"][data-body-type="4"] .Character_sprite {
     background: url(../images/Unit/medievalUnit_03.png);
 }
+/* BLUE MAGE */
+.Character[data-color="blue"][data-body-type="5"] .Character_sprite {
+    background: url(../images/Unit/medievalUnit_01.png);
+}
 
 /* ORANGE MALE */
 .Character[data-color="orange"][data-body-type="1"] .Character_sprite {
@@ -53,6 +57,10 @@
 /* ORANGE KNIGHT */
 .Character[data-color="orange"][data-body-type="4"] .Character_sprite {
     background: url(../images/Unit/medievalUnit_09.png);
+}
+/* ORANGE MAGE */
+.Character[data-color="orange"][data-body-type="5"] .Character_sprite {
+    background: url(../images/Unit/medievalUnit_07.png);
 }
 
 /* GREEN MALE */
@@ -71,6 +79,10 @@
 .Character[data-color="green"][data-body-type="4"] .Character_sprite {
     background: url(../images/Unit/medievalUnit_15.png);
 }
+/* GREEN MAGE */
+.Character[data-color="green"][data-body-type="5"] .Character_sprite {
+    background: url(../images/Unit/medievalUnit_13.png);
+}
 
 /* GRAY MALE */
 .Character[data-color="gray"][data-body-type="1"] .Character_sprite {
@@ -87,6 +99,10 @@
 /* GRAY KNIGHT */
 .Character[data-color="gray"][data-body-type="4"] .Character_sprite {
     background: url(../images/Unit/medievalUnit_21.png);
+}
+/* GRAY MAGE */
+.Character[data-color="gray"][data-body-type="5"] .Character_sprite {
+    background: url(../images/Unit/medievalUnit_19.png);
 }
 
 .Character_shadow {

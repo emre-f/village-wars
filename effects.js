@@ -39,8 +39,37 @@ function swordSlash(pos = { x: 0, y:0 }, targetPos = { x: 0, y:0 }) {
     const effectRef = firebase.database().ref(`effects/${uuid}`);
     effectRef.set({
         id: uuid,
+        type: "sword-slash",
         left,
         top,
         dir
+    })
+}
+
+function fireBall(pos, targetPos) {
+    var leftMod = 32;
+    var topMod = 0;
+
+    var leftRaw = 64 * pos.x + leftMod;
+    const left =  leftRaw +  "px";
+    
+    var topRaw = 64 * pos.y + topMod;
+    const top = topRaw + "px";
+
+    var targetLeftMod = 16;
+    var targetTopMod = 12;
+
+    const targetLeft = 64 * targetPos.x - leftRaw + targetLeftMod +  "px";
+    const targetTop = 64 * targetPos.y - topRaw + targetTopMod + "px";
+
+    var uuid = guidGenerator();
+    const effectRef = firebase.database().ref(`effects/${uuid}`);
+    effectRef.set({
+        id: uuid,
+        type: "fireball",
+        left,
+        top,
+        targetLeft,
+        targetTop,
     })
 }
