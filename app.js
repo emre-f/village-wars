@@ -1,4 +1,4 @@
-GOD_MODE = false; // Free upgrades and unit spawns
+GOD_MODE = true; // Free upgrades and unit spawns
 const MAP_SIZE = 30;
 const MAX_RESOURCE_ON_MAP = 80;
 var BASE_COLLECT_SPEED = 5;
@@ -34,6 +34,7 @@ let archerElements = {};
 var archerMoveTimer = 1;
 var archerMoverTimerCD = 1;
 
+// Purpose: Generate a square shaped map of desired size
 function generateMap(mapSize) {
     // Clear out old unit cells
     // const allUnitCellsRef = firebase.database().ref(`unitCells`);
@@ -105,6 +106,7 @@ function generateMap(mapSize) {
         }
     });
 
+    // Purpose: Networking/Managing all ground cells on the DB
     function manageUnitCells() {
 
         const allUnitCellsRef = firebase.database().ref(`unitCells`);
@@ -143,6 +145,7 @@ function generateMap(mapSize) {
         })
     }
 
+    // Purpose: Networking/Managing all players on the DB
     function managePlayers() {
         const allPlayersRef = firebase.database().ref(`players`);
         allPlayersRef.on("value", (snapshot) => {
@@ -326,6 +329,7 @@ function generateMap(mapSize) {
         })
     }
 
+    // Purpose: Networking/Managing all resources on the DB
     function manageResources() {
         const allResourcesRef = firebase.database().ref(`resources`);
 
@@ -407,6 +411,7 @@ function generateMap(mapSize) {
         })
     }
 
+    // Purpose: Networking/Managing all units on the DB
     function manageUnits() {
         const allUnitsRef = firebase.database().ref(`units`);
         
@@ -494,6 +499,7 @@ function generateMap(mapSize) {
         })
     }
 
+    // Purpose: Networking/Managing all knights on the DB
     function manageKnights() {
         const allKnightsRef = firebase.database().ref(`knights`);
 
@@ -581,6 +587,31 @@ function generateMap(mapSize) {
         })
     }
 
+    function manageEffects() {
+        const allEffectsRef = firebase.database().ref(`effects`);
+
+        allEffectsRef.on("child_added", (snapshot) => {
+            const eff = snapshot.val();
+            const slashElement = document.createElement("div");
+            slashElement.classList.add("sword-slash");
+
+            slashElement.innerHTML = (`
+                <div class="sword-animation-sprite" data-dir=${eff.dir}></div>
+            `);
+            
+            slashElement.style.transform = `translate3d(${eff.left}, ${eff.top}, 0)`;
+            gameContainer.appendChild(slashElement);
+
+            setTimeout(function(){
+                gameContainer.removeChild(slashElement);
+
+                //Remove from DB
+                firebase.database().ref(`effects/${eff.id}`).remove()
+            }, 325); 
+        })
+    }
+
+    // Purpose: Handles the spawning of all resources (only ran by the "admin player")
     function resourceHandler() {
         var mapResourceAmount = Object.keys(resources).length;
 
@@ -602,6 +633,7 @@ function generateMap(mapSize) {
         }
     }
 
+    // Purpose: Instructs all the villager units of the client to take their next move (see moveUnit())
     function unitHandler() {
         if(unitMoveTimer >= unitMoverTimerCD) {
             if(resources.length === 0) { 
@@ -664,6 +696,7 @@ function generateMap(mapSize) {
         }
     }
 
+    // Purpose: Instructs all the knights of the client to take their next move (see moveKnight())
     function knightHandler() {
         if(knightMoveTimer >= knightMoverTimerCD) {
 
@@ -742,6 +775,7 @@ function generateMap(mapSize) {
         }
     }
 
+    // Purpose: Spawn a specific resource somewhere random on the map
     function spawnResources(type) {
         
         // Type has to be "wood", "gold" or "meat"
@@ -781,6 +815,7 @@ function generateMap(mapSize) {
         })
     }
 
+    // Purpose: Moving the main character (what to do if walking into a resource, or an enemy)
     function moveCharacter() {
         // Progress can move timer
         if(moveTimer < moveTimerCD) {
@@ -810,6 +845,7 @@ function generateMap(mapSize) {
             
             if(hitTarget) {
                 firebase.database().ref(`players/${hitTarget.id}`).update({ health: hitTarget.health - PLAYER.damage });
+                swordSlash( { x: PLAYER.x, y: PLAYER.y }, {x: hitTarget.x, y: hitTarget.y } );
                 return;
             }
 
@@ -819,7 +855,7 @@ function generateMap(mapSize) {
                 if (hitUnit.ownerId !== playerId) { // If not your unit, damage it
                     firebase.database().ref(`units/${hitUnit.id}`).update({ health: hitUnit.health - PLAYER.damage });
                 } 
-        
+                swordSlash( { x: PLAYER.x, y: PLAYER.y }, {x: hitUnit.x, y: hitUnit.y } );
                 return;
             }
 
@@ -829,7 +865,7 @@ function generateMap(mapSize) {
                 if (hitKnight.ownerId !== playerId) { // If not your unit, damage it
                     firebase.database().ref(`knights/${hitKnight.id}`).update({ health: hitKnight.health - PLAYER.damage });
                 } 
-        
+                swordSlash( { x: PLAYER.x, y: PLAYER.y }, {x: hitKnight.x, y: hitKnight.y } );
                 return;
             }
 
@@ -839,7 +875,7 @@ function generateMap(mapSize) {
                 if (hitArcher.ownerId !== playerId) { // If not your unit, damage it
                     firebase.database().ref(`archers/${hitArcher.id}`).update({ health: hitArcher.health - PLAYER.damage });
                 } 
-        
+                swordSlash( { x: PLAYER.x, y: PLAYER.y }, {x: hitArcher.x, y: hitArcher.y } );
                 return;
             }
 
@@ -907,6 +943,7 @@ function generateMap(mapSize) {
         }
     }
 
+    // Purpose: Moving a single unit (villager), moving towards resources and moving out of blockages etc.
     function moveUnit(characterState, way, reTry = true) {
 
         const unitRef = firebase.database().ref(`units/${characterState.id}`);
@@ -1002,6 +1039,7 @@ function generateMap(mapSize) {
         }
     }
 
+    // Purpose: Moving a single knight (what happens when a target is found etc.)
     function moveKnight(characterState, way, reTry = true) {
         const knightRef = firebase.database().ref(`knights/${characterState.id}`);
 
@@ -1044,6 +1082,7 @@ function generateMap(mapSize) {
                 reTryMove();  
             } else {
                 firebase.database().ref(`players/${hitTarget.id}`).update({ health: hitTarget.health - dmg });
+                swordSlash( { x: characterState.x, y: characterState.y }, {x: hitTarget.x, y: hitTarget.y } );
             }
 
             return;
@@ -1056,6 +1095,7 @@ function generateMap(mapSize) {
                 reTryMove();
             } else { // If not your unit, damage it
                 firebase.database().ref(`units/${hitUnit.id}`).update({ health: hitUnit.health - dmg });
+                swordSlash( { x: characterState.x, y: characterState.y }, {x: hitUnit.x, y: hitUnit.y } );
             }
     
             return;
@@ -1068,6 +1108,7 @@ function generateMap(mapSize) {
                 reTryMove();
             } else {
                 firebase.database().ref(`knights/${hitKnight.id}`).update({ health: hitKnight.health - dmg });
+                swordSlash( { x: characterState.x, y: characterState.y }, {x: hitKnight.x, y: hitKnight.y } );
             }
     
             return;
@@ -1080,6 +1121,7 @@ function generateMap(mapSize) {
                 reTryMove();
             } else {
                 firebase.database().ref(`archers/${hitArcher.id}`).update({ health: hitArcher.health - dmg });
+                swordSlash( { x: characterState.x, y: characterState.y }, {x: hitArcher.x, y: hitArcher.y } );
             }
     
             return;
@@ -1089,6 +1131,7 @@ function generateMap(mapSize) {
         knightRef.update( { x: newPos.x, y: newPos.y } );
     }
 
+    // Purpose: Moving the map in accordance to where the player is moving to have a "camera effect"
     function setCamera() {
         var cameraWidth = cameraElement.offsetWidth;
         var cameraHeight = cameraElement.offsetHeight;
@@ -1147,6 +1190,7 @@ function generateMap(mapSize) {
         manageResources();
         manageUnits();
         manageKnights();
+        manageEffects();
 
         setupUpgradeButtons();
         setupSpawnButtons();

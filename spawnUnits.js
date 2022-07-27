@@ -1,4 +1,4 @@
-// Setup unit spawn buttons
+// Purpose: Setup the buttons related to spawning units
 function setupSpawnButtons () {
     const villagerCosts = villagerSpawnCost;
     const villagerCostTable = document.querySelector(".spawn-villager-cost-table");
@@ -30,6 +30,7 @@ function setupSpawnButtons () {
     })
 };
 
+// Purpose: The function that spawns a villager at a given position
 function spawnVillagerAt(spawnPos) {
     const villagerCosts = villagerSpawnCost;
 
@@ -71,6 +72,7 @@ function spawnVillagerAt(spawnPos) {
     }
 }
 
+// Purpose: The function that spawns a knight at a given position
 function spawnKnightAt(spawnPos) {
     const knightCosts = knightSpawnCost;
 

@@ -1,0 +1,49 @@
+.sword-slash {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    z-index: 99;
+}
+
+.sword-animation-sprite {
+    background: url(../images/Effects/sword_slash.png);
+    image-rendering: pixelated;
+    width: 32px;
+    height: 32px;
+}
+
+.sword-animation-sprite[data-dir="right"] {
+    animation: sword-slash-effect-right 0.35s normal forwards;
+}
+
+.sword-animation-sprite[data-dir="left"] {
+    animation: sword-slash-effect-left 0.35s normal forwards;
+}
+
+.sword-animation-sprite[data-dir="up"] {
+    animation: sword-slash-effect-up 0.35s normal forwards;
+}
+
+.sword-animation-sprite[data-dir="down"] {
+    animation: sword-slash-effect-down 0.35s normal forwards;
+}
+
+@keyframes sword-slash-effect-right {
+    0% { opacity: 1; transform: scale(1) translate3d(0px, 0, 0) }
+    100% { opacity: 0.4; transform: scale(2) translate3d(15px, 0, 0) } 
+}
+
+@keyframes sword-slash-effect-left {
+    0% { opacity: 1; transform: scale(1) translate3d(0px, 0, 0) rotate(180deg) }
+    100% { opacity: 0.4; transform: scale(2) translate3d(-15px, 0, 0) rotate(180deg) } 
+}
+
+@keyframes sword-slash-effect-up {
+    0% { opacity: 1; transform: scale(1) translate3d(0, 0, 0) rotate(-90deg) }
+    100% { opacity: 0.4; transform: scale(2) translate3d(0, -15px, 0) rotate(-90deg) } 
+}
+
+@keyframes sword-slash-effect-down {
+    0% { opacity: 1; transform: scale(1) translate3d(0, 0, 0) rotate(90deg) }
+    100% { opacity: 0.4; transform: scale(2) translate3d(0, 15px, 0) rotate(90deg) } 
+}
