@@ -86,10 +86,16 @@ function generateMap(mapSize) {
         right: "right",
     }
     const keys = {
+        //ARROW KEYS
         38: directions.up,
         37: directions.left,
         39: directions.right,
         40: directions.down,
+        //WASD
+        87: directions.up,
+        65: directions.left,
+        68: directions.right,
+        83: directions.down,
     }
     document.addEventListener("keydown", (e) => {
         var dir = keys[e.which];
