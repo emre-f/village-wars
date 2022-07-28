@@ -1,3 +1,6 @@
+const FPS = 60;
+let lastTimestamp = 0;
+
 GOD_MODE = true; // Free upgrades and unit spawns
 const MAP_SIZE = 30;
 const MAX_RESOURCE_ON_MAP = 80;
@@ -19,20 +22,20 @@ let resourcesElements = {};
 let units = {};
 let unitElements = {};
 
-var unitMoveTimer = 1;
-var unitMoverTimerCD = 1;
+var unitMoveTimer = 0.4;
+var unitMoverTimerCD = 0.4;
 
 let knights = {};
 let knightElements = {};
 
-var knightMoveTimer = 1;
-var knightMoverTimerCD = 1;
+var knightMoveTimer = 0.4;
+var knightMoverTimerCD = 0.4;
 
 let mages = {};
 let mageElements = {};
 
-var mageMoveTimer = 1;
-var mageMoverTimerCD = 1;
+var mageMoveTimer = 0.4;
+var mageMoverTimerCD = 0.4;
 
 // Purpose: Generate a square shaped map of desired size
 function generateMap(mapSize) {
@@ -72,11 +75,11 @@ function generateMap(mapSize) {
     y = 64;
     speed = 1;
     var held_directions = []; //State of which arrow keys we are holding down
-    var moveTimer = 0.5;
-    var moveTimerCD = 0.5;
+    var moveTimer = 0.2;
+    var moveTimerCD = 0.2;
 
-    var resourceSpawnTimer = 6;
-    var resourceSpawnTimerCD = 16;
+    var resourceSpawnTimer = 5;
+    var resourceSpawnTimerCD = 10;
 
     /* Direction key state */
     const directions = {
@@ -157,7 +160,7 @@ function generateMap(mapSize) {
         allPlayersRef.on("value", (snapshot) => {
             //Fires whenever a change occurs
             players = snapshot.val() || {};
-        
+  
             // ASSIGN ADMIN PLAYER
             if(Object.keys(players).includes(playerId)) {
                 // If nobody is the admin player, assign it to him
@@ -175,7 +178,7 @@ function generateMap(mapSize) {
                         console.log("New Admin Player: " + newAdminPlayer.name + " (ID: " + newAdminPlayer.id + ")");
 
                         let ref = firebase.database().ref(`players/${newAdminPlayer.id}`);
-                        ref.transaction((obj) => {
+                        ref.transaction((obj) => { if (obj == null) { return }
                             obj["adminPlayer"] = true;
                             return obj
                         })
@@ -242,18 +245,18 @@ function generateMap(mapSize) {
                     var currMagesCount = 0
 
                     Object.keys(units).forEach((key) => {
-                        if(units[key].ownerId === playerId) { currVillCount += 1; }
+                        if(units[key] != null && units[key].ownerId === playerId) { currVillCount += 1; }
                     })
      
                     Object.keys(knights).forEach((key) => {
-                        if(knights[key].ownerId === playerId) { currKnightCount += 1; }
+                        if(knights[key] != null && knights[key].ownerId === playerId) { currKnightCount += 1; }
                     })
 
                     Object.keys(mages).forEach((key) => {
-                        if(mages[key].ownerId === playerId) { currMagesCount += 1; }
+                        if(mages[key] != null && mages[key].ownerId === playerId) { currMagesCount += 1; }
                     })
 
-                    playerRef.transaction((obj) => {
+                    playerRef.transaction((obj) => { if (obj == null) { return }
                         obj.villagerUnitCount = currVillCount;
                         obj.knightUnitCount = currKnightCount;
                         obj.mageUnitCount = currMagesCount;
@@ -769,6 +772,7 @@ function generateMap(mapSize) {
             // Get all unit positions: (If there is a unit near a resource, don't go to it)
             const allUnitPos = [];
             Object.keys(units).forEach((key) => {
+                if ( units[key] == null ) { return; }
                 allUnitPos.push( { id: key, x: units[key].x, y: units[key].y } );
             })
 
@@ -777,7 +781,7 @@ function generateMap(mapSize) {
                 const characterState = units[key];
 
                 // If this is YOUR villager, tell them their next move
-                if(characterState.ownerId === playerId) {
+                if(characterState != null && characterState.ownerId === playerId) {
                     // console.log("Controlling your villager");
                     // Get the closest resource's position and walk towards it
                     var closestResourcesPos = {};
@@ -829,25 +833,25 @@ function generateMap(mapSize) {
             const allPotentialTargetPos = [];
 
             Object.keys(units).forEach((key) => {
-                if( units[key].ownerId === playerId) { return; }
+                if( units[key] == null || units[key].ownerId === playerId ) { return; }
 
                 allPotentialTargetPos.push( { x: units[key].x, y: units[key].y } );
             })
 
             Object.keys(players).forEach((key) => {
-                if( players[key].id === playerId) { return; }
+                if( players[key] == null || players[key].id === playerId ) { return; }
 
                 allPotentialTargetPos.push( { x: players[key].x, y: players[key].y } );
             })
 
             Object.keys(knights).forEach((key) => {
-                if( knights[key].ownerId === playerId) { return; }
+                if( knights[key] == null || knights[key].ownerId === playerId ) { return; }
 
                 allPotentialTargetPos.push( { x: knights[key].x, y: knights[key].y } );
             })
             
             Object.keys(mages).forEach((key) => {
-                if( mages[key].ownerId === playerId) { return; }
+                if( mages[key] == null || mages[key]?.ownerId === playerId) { return; }
 
                 allPotentialTargetPos.push( { x: mages[key].x, y: mages[key].y } );
             })
@@ -862,7 +866,7 @@ function generateMap(mapSize) {
                 const characterState = knights[key];
 
                 // If this is YOUR knight, tell them their next move
-                if(characterState.ownerId === playerId) {
+                if(characterState != null && characterState.ownerId === playerId) {
                     // Get the closest resource's position and walk towards it
                     var closestTargetPos = {};
                     var closestDistance = Number.MAX_SAFE_INTEGER;
@@ -908,28 +912,28 @@ function generateMap(mapSize) {
             const allPotentialTargetPos = [];
 
             Object.keys(units).forEach((key) => {
-                if( units[key].ownerId === playerId) { return; }
+                if( units[key] == null || units[key].ownerId === playerId) { return; }
                 var result = units[key];
                 result["tribe"] = "units";
                 allPotentialTargetPos.push(result)
             })
 
             Object.keys(players).forEach((key) => {
-                if( players[key].id === playerId) { return; }
+                if( players[key] == null || players[key].id === playerId) { return; }
                 var result = players[key];
                 result["tribe"] = "players";
                 allPotentialTargetPos.push(result);
             })
 
             Object.keys(knights).forEach((key) => {
-                if( knights[key].ownerId === playerId) { return; }
+                if( knights[key] == null || knights[key].ownerId === playerId) { return; }
                 var result = knights[key];
                 result["tribe"] = "knights";
                 allPotentialTargetPos.push(result);
             })
             
             Object.keys(mages).forEach((key) => {
-                if( mages[key].ownerId === playerId) { return; }
+                if( mages[key] == null || mages[key].ownerId === playerId) { return; }
                 var result = mages[key];
                 result["tribe"] = "mages";
                 allPotentialTargetPos.push(result);
@@ -945,7 +949,7 @@ function generateMap(mapSize) {
                 const characterState = mages[key];
 
                 // If this is YOUR mage, tell them their next move
-                if(characterState.ownerId === playerId) {
+                if(characterState != null && characterState.ownerId === playerId) {
                     // Try to attack from range
                     var attackRange = 4;
                     var inRangeTargets = [];
@@ -1052,7 +1056,7 @@ function generateMap(mapSize) {
         if(moveTimer < moveTimerCD) {
             moveTimer += 1/60;
         }
-
+ 
         // Old player positions
         let newX = players[playerId].x;
 		let newY = players[playerId].y;
@@ -1070,15 +1074,15 @@ function generateMap(mapSize) {
             if (newX < 0 || newX >= MAP_SIZE || newY < 0 || newY >= MAP_SIZE) { 
                 return
             };
-
+            
             // Check if new position is occupied
             var hitTarget = isOccupiedByPlayer(newX, newY, players)
             
             if(hitTarget) {
     
                 let ref = firebase.database().ref(`players/${hitTarget.id}`);
-                ref.transaction((obj) => {
-                    obj["health"] = hitTarget.health - PLAYER.damage;
+                ref.transaction((obj) => { if (obj == null) { return }
+                    obj.health = obj.health  - PLAYER.damage;
                     return obj
                 })
 
@@ -1090,8 +1094,8 @@ function generateMap(mapSize) {
 
             if (hitUnit) {
                 if (hitUnit.ownerId !== playerId) { // If not your unit, damage it
-                    firebase.database().ref(`units/${hitUnit.id}`).transaction((obj) => {
-                        obj["health"] = obj["health"] - PLAYER.damage;
+                    firebase.database().ref(`units/${hitUnit.id}`).transaction((obj) => { if (obj == null) { return }
+                        obj.health = obj.health - PLAYER.damage;
                         return obj
                     })
                 } 
@@ -1103,8 +1107,8 @@ function generateMap(mapSize) {
 
             if (hitKnight) {
                 if (hitKnight.ownerId !== playerId) { // If not your unit, damage it
-                    firebase.database().ref(`knights/${hitKnight.id}`).transaction((obj) => {
-                        obj["health"] = obj["health"] - PLAYER.damage;
+                    firebase.database().ref(`knights/${hitKnight.id}`).transaction((obj) => { if (obj == null) { return }
+                        obj.health = obj.health - PLAYER.damage;
                         return obj
                     })
                 } 
@@ -1116,8 +1120,8 @@ function generateMap(mapSize) {
 
             if (hitMage) {
                 if (hitMage.ownerId !== playerId) { // If not your unit, damage it
-                    firebase.database().ref(`mages/${hitMage.id}`).transaction((obj) => {
-                        obj["health"] = obj["health"] - PLAYER.damage;
+                    firebase.database().ref(`mages/${hitMage.id}`).transaction((obj) => { if (obj == null) { return }
+                        obj.health = obj.health - PLAYER.damage;
                         return obj
                     })
                 } 
@@ -1133,7 +1137,7 @@ function generateMap(mapSize) {
                 var targetEle = resourcesElements[getKeyString(hitResource.x, hitResource.y)];
 
                 // Shake the hit resource
-                if (typeof targetEle !== 'undefined') {
+                if (typeof targetEle !== 'undefined' && !targetEle.querySelector(".Resource_sprite").classList.contains("shake")) {
                     targetEle.querySelector(".Resource_sprite").classList.add("shake");
                     setTimeout(() => {
                         targetEle.querySelector(".Resource_sprite").classList.remove("shake");
@@ -1144,8 +1148,8 @@ function generateMap(mapSize) {
                 if(hitResource.type === "wood") {
                     remove_amount += 2 * plyr.stats.chopLevel;
 
-                    playerRef.transaction((obj) => {
-                        obj["resources"] = { 
+                    playerRef.transaction((obj) => { if (obj == null) { return }
+                        obj.resources = { 
                             gold: plyr.resources.gold,
                             wood: plyr.resources.wood + Math.min(remove_amount, hitResource.amountLeft),
                             meat: plyr.resources.meat
@@ -1156,8 +1160,8 @@ function generateMap(mapSize) {
                 } else if(hitResource.type === "gold") {
                     remove_amount += 2 * plyr.stats.mineLevel;
 
-                    playerRef.transaction((obj) => {
-                        obj["resources"] = { 
+                    playerRef.transaction((obj) => { if (obj == null) { return }
+                        obj.resources = { 
                             gold: plyr.resources.gold + Math.min(remove_amount, hitResource.amountLeft),
                             wood: plyr.resources.wood,
                             meat: plyr.resources.meat
@@ -1168,8 +1172,8 @@ function generateMap(mapSize) {
                 } else if(hitResource.type === "meat") {
                     remove_amount += 2 * plyr.stats.huntLevel;
 
-                    playerRef.transaction((obj) => {
-                        obj["resources"] = { 
+                    playerRef.transaction((obj) => { if (obj == null) { return }
+                        obj.resources = { 
                             gold: plyr.resources.gold,
                             wood: plyr.resources.wood,
                             meat: plyr.resources.meat + Math.min(remove_amount, hitResource.amountLeft)
@@ -1179,8 +1183,8 @@ function generateMap(mapSize) {
 
                 }
 
-                firebase.database().ref(`resources/${getKeyString(hitResource.x, hitResource.y)}`).transaction((obj) => {
-                    obj["amountLeft"] = obj["amountLeft"] - Math.min(remove_amount, obj["amountLeft"])
+                firebase.database().ref(`resources/${getKeyString(hitResource.x, hitResource.y)}`).transaction((obj) => { if (obj == null) { return }
+                    obj.amountLeft = obj.amountLeft - Math.min(remove_amount, obj.amountLeft)
                     return obj
                 });
 
@@ -1189,10 +1193,10 @@ function generateMap(mapSize) {
 
             // TO DO: Put map limits here
             if (newX >= 0 && newX < MAP_SIZE * 16 && newY >= 0 && newY < MAP_SIZE * 16) {
-
-                playerRef.transaction((obj) => {
-                    obj["x"] = newX;
-                    obj["y"] = newY;
+                
+                playerRef.transaction((obj) => { if (obj == null) { return }
+                    obj.x = newX;
+                    obj.y = newY;
 
                     return obj
                 })
@@ -1247,7 +1251,7 @@ function generateMap(mapSize) {
             var targetEle = resourcesElements[getKeyString(hitResource.x, hitResource.y)];
 
             // Shake the hit resource
-            if (typeof targetEle !== 'undefined') {
+            if (typeof targetEle !== 'undefined' && !targetEle.querySelector(".Resource_sprite").classList.contains("shake")) {
                 targetEle.querySelector(".Resource_sprite").classList.add("shake");
                 setTimeout(() => {
                     targetEle.querySelector(".Resource_sprite").classList.remove("shake");
@@ -1258,8 +1262,8 @@ function generateMap(mapSize) {
             if(hitResource.type === "wood") {
                 remove_amount += plyr.stats.chopLevel;
 
-                playerRef.transaction((obj) => {
-                    obj["resources"] = { 
+                playerRef.transaction((obj) => { if (obj == null) { return }
+                    obj.resources = { 
                         gold: plyr.resources.gold,
                         wood: plyr.resources.wood + Math.min(remove_amount, hitResource.amountLeft),
                         meat: plyr.resources.meat 
@@ -1270,8 +1274,8 @@ function generateMap(mapSize) {
             } else if(hitResource.type === "gold") {
                 remove_amount += plyr.stats.mineLevel;
 
-                playerRef.transaction((obj) => {
-                    obj["resources"] = { 
+                playerRef.transaction((obj) => { if (obj == null) { return }
+                    obj.resources = { 
                         gold: plyr.resources.gold + Math.min(remove_amount, hitResource.amountLeft),
                         wood: plyr.resources.wood,
                         meat: plyr.resources.meat 
@@ -1282,8 +1286,8 @@ function generateMap(mapSize) {
             } else if(hitResource.type === "meat") {
                 remove_amount += plyr.stats.huntLevel;
 
-                playerRef.transaction((obj) => {
-                    obj["resources"] = { 
+                playerRef.transaction((obj) => { if (obj == null) { return }
+                    obj.resources = { 
                         gold: plyr.resources.gold,
                         wood: plyr.resources.wood,
                         meat: plyr.resources.meat + Math.min(remove_amount, hitResource.amountLeft)
@@ -1292,16 +1296,16 @@ function generateMap(mapSize) {
                 })
             }
 
-            firebase.database().ref(`resources/${getKeyString(hitResource.x, hitResource.y)}`).transaction((obj) => {
-                obj["amountLeft"] = obj["amountLeft"] - Math.min(remove_amount, obj["amountLeft"])
+            firebase.database().ref(`resources/${getKeyString(hitResource.x, hitResource.y)}`).transaction((obj) => { if (obj == null) { return }
+                obj.amountLeft = obj.amountLeft - Math.min(remove_amount, obj.amountLeft)
                 return obj
             });
 
         } else {
             // Not hitting a resource... move
-            unitRef.transaction((obj) => {
-                obj["x"] = newPos.x;
-                obj["y"] = newPos.y;
+            unitRef.transaction((obj) => { if (obj == null) { return }
+                obj.x = newPos.x;
+                obj.y = newPos.y;
 
                 return obj
             })
@@ -1350,8 +1354,8 @@ function generateMap(mapSize) {
             if(hitTarget.id === characterState.ownerId) { 
                 reTryMove();  
             } else {
-                firebase.database().ref(`players/${hitTarget.id}`).transaction((obj) => {
-                    obj["health"] = obj["health"] - dmg;
+                firebase.database().ref(`players/${hitTarget.id}`).transaction((obj) => { if (obj == null) { return }
+                    obj.health = obj.health - dmg;
                     return obj
                 });
                 
@@ -1367,8 +1371,8 @@ function generateMap(mapSize) {
             if (hitUnit.ownerId === characterState.ownerId) { 
                 reTryMove();
             } else { // If not your unit, damage it
-                firebase.database().ref(`units/${hitUnit.id}`).transaction((obj) => {
-                    obj["health"] = obj["health"] - dmg;
+                firebase.database().ref(`units/${hitUnit.id}`).transaction((obj) => { if (obj == null) { return }
+                    obj.health = obj.health - dmg;
                     return obj
                 });
 
@@ -1384,8 +1388,8 @@ function generateMap(mapSize) {
             if (hitKnight.ownerId === characterState.ownerId) { 
                 reTryMove();
             } else {
-                firebase.database().ref(`knights/${hitKnight.id}`).transaction((obj) => {
-                    obj["health"] = obj["health"] - dmg;
+                firebase.database().ref(`knights/${hitKnight.id}`).transaction((obj) => { if (obj == null) { return }
+                    obj.health = obj.health - dmg;
                     return obj
                 });
 
@@ -1401,8 +1405,8 @@ function generateMap(mapSize) {
             if (hitMage.ownerId === playerId) { // If not your unit, damage it
                 reTryMove();
             } else {
-                firebase.database().ref(`mages/${hitMage.id}`).transaction((obj) => {
-                    obj["health"] = obj["health"] - dmg;
+                firebase.database().ref(`mages/${hitMage.id}`).transaction((obj) => { if (obj == null) { return }
+                    obj.health = obj.health - dmg;
                     return obj
                 });
 
@@ -1413,9 +1417,9 @@ function generateMap(mapSize) {
         }
             
         // Not hitting anything... move
-        knightRef.transaction((obj) => {
-            obj["x"] = newPos.x;
-            obj["y"] = newPos.y;
+        knightRef.transaction((obj) => { if (obj == null) { return }
+            obj.x = newPos.x;
+            obj.y = newPos.y;
 
             return obj
         });
@@ -1464,7 +1468,7 @@ function generateMap(mapSize) {
             if(hitTarget.id === characterState.ownerId) { 
                 reTryMove();  
             } else {
-                firebase.database().ref(`players/${hitTarget.id}`).transaction((obj) => {
+                firebase.database().ref(`players/${hitTarget.id}`).transaction((obj) => { if (obj == null) { return }
                     obj["health"] = obj["health"] - dmg;
                     return obj
                 });
@@ -1481,7 +1485,7 @@ function generateMap(mapSize) {
             if (hitUnit.ownerId === characterState.ownerId) { 
                 reTryMove();
             } else { // If not your unit, damage it
-                firebase.database().ref(`units/${hitUnit.id}`).transaction((obj) => {
+                firebase.database().ref(`units/${hitUnit.id}`).transaction((obj) => { if (obj == null) { return }
                     obj["health"] = obj["health"] - dmg;
                     return obj
                 });
@@ -1498,7 +1502,7 @@ function generateMap(mapSize) {
             if (hitKnight.ownerId === characterState.ownerId) { 
                 reTryMove();
             } else {
-                firebase.database().ref(`knights/${hitKnight.id}`).transaction((obj) => {
+                firebase.database().ref(`knights/${hitKnight.id}`).transaction((obj) => { if (obj == null) { return }
                     obj["health"] = obj["health"] - dmg;
                     return obj
                 });
@@ -1515,8 +1519,8 @@ function generateMap(mapSize) {
             if (hitMage.ownerId === playerId) { // If not your unit, damage it
                 reTryMove();
             } else {
-                firebase.database().ref(`mages/${hitMage.id}`).transaction((obj) => {
-                    obj["health"] = obj["health"] - dmg;
+                firebase.database().ref(`mages/${hitMage.id}`).transaction((obj) => { if (obj == null) { return }
+                    obj.health = obj.health - dmg;
                     return obj
                 });
 
@@ -1527,9 +1531,9 @@ function generateMap(mapSize) {
         }
             
         // Not hitting anything... move
-        mageRef.transaction((obj) => {
-            obj["x"] = newPos.x;
-            obj["y"] = newPos.y;
+        mageRef.transaction((obj) => { if (obj == null) { return } 
+            obj.x = newPos.x;
+            obj.y = newPos.y;
 
             return obj
         });
@@ -1540,8 +1544,8 @@ function generateMap(mapSize) {
         var plyr = players[characterState.ownerId];
         var dmg = characterState.damage + 2 * plyr.stats.attackLevel;
 
-        firebase.database().ref(`${target.tribe}/${target.id}`).transaction((obj) => {
-            obj["health"] = obj["health"] - dmg;
+        firebase.database().ref(`${target.tribe}/${target.id}`).transaction((obj) => { if (obj == null) { return }
+            obj.health = obj.health - dmg;
             return obj
         });
 
@@ -1572,7 +1576,9 @@ function generateMap(mapSize) {
         // )`;
     }
 
-    const step = () => {
+    const step = (timestamp) => {
+        requestAnimationFrame(step);
+        if (timestamp - lastTimestamp < 1000 / FPS) return;
 
         pixel_size = parseInt(
             getComputedStyle(document.documentElement).getPropertyValue('--pixel-size')
@@ -1593,9 +1599,10 @@ function generateMap(mapSize) {
 
         PLAYER = players[playerId];
 
-        requestAnimationFrame(() => { // Web browser calls this function every time a new frame begins
-            step();
-        })
+        // requestAnimationFrame(() => { // Web browser calls this function every time a new frame begins
+        //     step();
+        // })
+        lastTimestamp = timestamp;
     }
 
     function initGame() {
@@ -1613,7 +1620,7 @@ function generateMap(mapSize) {
         setupUpgradeButtons();
         setupSpawnButtons();
 
-        step();
+        step(); 
     }
     
 

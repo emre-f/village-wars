@@ -77,7 +77,7 @@ function spawnVillagerAt(spawnPos) {
         })
 
         // Subtract the resources
-        firebase.database().ref(`players/${PLAYER.id}`).transaction((obj) => {
+        firebase.database().ref(`players/${PLAYER.id}`).transaction((obj) => { if (obj == null) { return }
             obj.resources.gold = obj.resources.gold - villagerCosts.goldCost;
             obj.resources.wood = obj.resources.wood - villagerCosts.woodCost;
             obj.resources.meat = obj.resources.meat - villagerCosts.meatCost;
@@ -118,7 +118,7 @@ function spawnKnightAt(spawnPos) {
             y: spawnPos.y,
         })
 
-        firebase.database().ref(`players/${PLAYER.id}`).transaction((obj) => {
+        firebase.database().ref(`players/${PLAYER.id}`).transaction((obj) => { if (obj == null) { return }
             obj.resources.gold = obj.resources.gold - knightCosts.goldCost;
             obj.resources.wood = obj.resources.wood - knightCosts.woodCost;
             obj.resources.meat = obj.resources.meat - knightCosts.meatCost;
@@ -159,7 +159,7 @@ function spawnMageAt(spawnPos) {
             y: spawnPos.y,
         })
 
-        firebase.database().ref(`players/${PLAYER.id}`).transaction((obj) => {
+        firebase.database().ref(`players/${PLAYER.id}`).transaction((obj) => { if (obj == null) { return }
             obj.resources.gold = obj.resources.gold - mageCosts.goldCost;
             obj.resources.wood = obj.resources.wood - mageCosts.woodCost;
             obj.resources.meat = obj.resources.meat - mageCosts.meatCost;

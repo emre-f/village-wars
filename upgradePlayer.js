@@ -27,7 +27,7 @@ function setupUpgradeButtons () {
            {
             if(PLAYER.stats.healthLevel === 10) { return; }
 
-            firebase.database().ref(`players/${PLAYER.id}`).transaction((obj) => {
+            firebase.database().ref(`players/${PLAYER.id}`).transaction((obj) => { if (obj == null) { return }
                 obj.health = obj.health + 20,
                 obj.resources = {
                     gold: obj.resources.gold - costs.goldCost,
@@ -48,21 +48,21 @@ function setupUpgradeButtons () {
 
         // Buff health of all villagers and other units as well
         Object.keys(units).forEach((key) => {
-            firebase.database().ref(`units/${key}`).transaction((obj) => {
+            firebase.database().ref(`units/${key}`).transaction((obj) => { if (obj == null) { return }
                 obj.health = obj.health + 3
                 return obj
             });
         })
 
         Object.keys(knights).forEach((key) => {
-            firebase.database().ref(`knights/${key}`).transaction((obj) => {
+            firebase.database().ref(`knights/${key}`).transaction((obj) => { if (obj == null) { return }
                 obj.health = obj.health + 7
                 return obj
             });
         })
 
         Object.keys(mages).forEach((key) => {
-            firebase.database().ref(`mages/${key}`).transaction((obj) => {
+            firebase.database().ref(`mages/${key}`).transaction((obj) => { if (obj == null) { return }
                 obj.health = obj.health + 3
                 return obj
             });
@@ -80,7 +80,7 @@ function setupUpgradeButtons () {
            {
             if(PLAYER.stats.attackLevel === 10) { return; }
 
-            firebase.database().ref(`players/${PLAYER.id}`).transaction((obj) => {
+            firebase.database().ref(`players/${PLAYER.id}`).transaction((obj) => { if (obj == null) { return }
                 obj.damage = obj.damage + 2,
                 obj.resources = {
                     gold: obj.resources.gold - costs.goldCost,
@@ -110,8 +110,7 @@ function setupUpgradeButtons () {
            {
             if(PLAYER.stats.mineLevel === 10) { return; }
 
-            firebase.database().ref(`players/${PLAYER.id}`).transaction((obj) => {
-                obj.damage = obj.damage + 2,
+            firebase.database().ref(`players/${PLAYER.id}`).transaction((obj) => { if (obj == null) { return }
                 obj.resources = {
                     gold: obj.resources.gold,
                     wood: obj.resources.wood - costs.woodCost,
@@ -140,8 +139,7 @@ function setupUpgradeButtons () {
            {
             if(PLAYER.stats.chopLevel === 10) { return; }
 
-            firebase.database().ref(`players/${PLAYER.id}`).transaction((obj) => {
-                obj.damage = obj.damage + 2,
+            firebase.database().ref(`players/${PLAYER.id}`).transaction((obj) => { if (obj == null) { return }
                 obj.resources = {
                     gold: obj.resources.gold - costs.goldCost,
                     wood: obj.resources.wood,
@@ -170,8 +168,7 @@ function setupUpgradeButtons () {
            {
             if(PLAYER.stats.huntLevel === 10) { return; }
 
-            firebase.database().ref(`players/${PLAYER.id}`).transaction((obj) => {
-                obj.damage = obj.damage + 2,
+            firebase.database().ref(`players/${PLAYER.id}`).transaction((obj) => { if (obj == null) { return }
                 obj.resources = {
                     gold: obj.resources.gold - costs.goldCost,
                     wood: obj.resources.wood - costs.woodCost,
