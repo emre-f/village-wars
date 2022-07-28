@@ -42,6 +42,9 @@
 
     </div>
 
+    <div class="message">
+    </div>
+
     <div class="player-stats">
       
       <table class="player-stats-table">
@@ -256,7 +259,7 @@
           </td> 
         </tr>
 
-        <tr style="text-align: center; font-size: 14px; opacity: 0.5;">
+        <!-- <tr style="text-align: center; font-size: 14px; opacity: 0.5;">
           <td colspan="2">HP</td>
           <td colspan="2"> 10 + 15 * lvl </td>
         </tr>
@@ -267,7 +270,7 @@
         <tr style="text-align: center; font-size: 14px; opacity: 0.5;">
           <td colspan="2"> COLLECT SPD </td>
           <td colspan="2"> 5 + 2 * lvl </td>
-        </tr>
+        </tr> -->
 
       </table>
 
@@ -360,6 +363,11 @@
       </table>
     </div>
 
+    <div class="minimap">
+      <div class="minimap-frame">
+      </div>
+    </div>
+
     <!-- the backbone -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <!-- the authentication -->
@@ -382,11 +390,29 @@
       firebase.initializeApp(firebaseConfig);
     </script>
 
-    <script src="KeyPressListener.js"></script>
-    <script src="app.js"></script>
-    <script src="utils.js"></script>
-    <script src="upgradePlayer.js"></script>
-    <script src="spawnUnits.js"></script>
-    <script src="effects.js"></script>
+    <script src="src/utils/KeyPressListener.js"></script>
+    <script src="src/utils/variables.js"></script>
+    <script src="src/utils/minimap.js"></script>
+    <script src="src/utils/utils.js"></script>
+
+    <script src="src/mapManagement/resources.js"></script>
+    <script src="src/mapManagement/unitCells.js"></script>
+    <script src="src/mapManagement/utils.js"></script>
+
+    <script src="src/app.js"></script>
+    <script src="src/messages.js"></script>
+    
+    <script src="src/playerManagement/utils.js"></script>
+    <script src="src/playerManagement/upgradePlayer.js"></script>
+    <script src="src/playerManagement/players.js"></script>
+
+    <script src="src/unitManagement/utils.js"></script>
+    <script src="src/unitManagement/spawnButtons.js"></script>
+    <script src="src/unitManagement/general.js"></script>
+    <script src="src/unitManagement/units.js"></script>
+    <script src="src/unitManagement/knights.js"></script>
+    <script src="src/unitManagement/mages.js"></script>
+
+    <script src="src/effectsManagement/effects.js"></script>
   </body>
 </html>

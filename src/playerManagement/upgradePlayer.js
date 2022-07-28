@@ -49,21 +49,27 @@ function setupUpgradeButtons () {
         // Buff health of all villagers and other units as well
         Object.keys(units).forEach((key) => {
             firebase.database().ref(`units/${key}`).transaction((obj) => { if (obj == null) { return }
+                if (obj.ownerId !== playerId) { return; } // Only buff health of ur units
                 obj.health = obj.health + 3
+                obj.maxHealth = obj.maxHealth + 3
                 return obj
             });
         })
 
         Object.keys(knights).forEach((key) => {
             firebase.database().ref(`knights/${key}`).transaction((obj) => { if (obj == null) { return }
+                if (obj.ownerId !== playerId) { return; } // Only buff health of ur units     
                 obj.health = obj.health + 7
+                obj.maxHealth = obj.maxHealth + 7
                 return obj
             });
         })
 
         Object.keys(mages).forEach((key) => {
             firebase.database().ref(`mages/${key}`).transaction((obj) => { if (obj == null) { return }
+                if (obj.ownerId !== playerId) { return; } // Only buff health of ur units
                 obj.health = obj.health + 3
+                obj.maxHealth = obj.maxHealth + 3
                 return obj
             });
         })

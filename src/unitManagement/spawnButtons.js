@@ -45,8 +45,9 @@ function setupSpawnButtons () {
     })
 };
 
+// ATTEMPT = 0 is down, 1 is left, 2 is right, 3 is top, 4 is just return (fail)
 // Purpose: The function that spawns a villager at a given position
-function spawnVillagerAt(spawnPos) {
+function spawnVillagerAt(spawnPos, attempt = 0) {
     const villagerCosts = villagerSpawnCost;
 
     if((PLAYER.resources.gold >= villagerCosts.goldCost &&
@@ -58,9 +59,18 @@ function spawnVillagerAt(spawnPos) {
         // Can control max 3 villagers
         if(PLAYER.villagerUnitCount >= PLAYER.maxVillagerUnitCount) { return; }
 
-        if(!clearArea(spawnPos, players, resources, units, knights, mages)) { return; }
+        // Attempt other angles if down is full
+        if(!clearArea(spawnPos, players, resources, units, knights, mages)) { 
+            if (attempt === 0) { spawnPos.y -= 1; spawnPos.x -= 1 } // go to left
+            else if (attempt === 1) { spawnPos.x += 2; } // go to right
+            else if (attempt === 2) { spawnPos.x -= 1; spawnPos.y -= 1} // go to top
 
-        var uuid = Math.random().toString(36).slice(-6);
+            if (attempt < 3) { spawnVillagerAt(spawnPos, attempt + 1) };
+
+            return 
+        }
+
+        var uuid = guidGenerator();
 
         unitRef = firebase.database().ref(`units/${PLAYER.id}:${PLAYER.villagerUnitCount}:${uuid}`);
 
@@ -69,7 +79,8 @@ function spawnVillagerAt(spawnPos) {
             number: PLAYER.villagerUnitCount,
             ownerId: PLAYER.id,
             name: "Villager",
-            health: 20,
+            health: 20 + 3 * PLAYER.stats.healthLevel,
+            maxHealth: 20 + 3 * PLAYER.stats.healthLevel,
             color: PLAYER.color,
             bodyType: (Math.random()>=0.5)? 1 : 2,
             x: spawnPos.x,
@@ -88,7 +99,7 @@ function spawnVillagerAt(spawnPos) {
 }
 
 // Purpose: The function that spawns a knight at a given position
-function spawnKnightAt(spawnPos) {
+function spawnKnightAt(spawnPos, attempt = 0) {
     const knightCosts = knightSpawnCost;
 
     if((PLAYER.resources.gold >= knightCosts.goldCost &&
@@ -100,9 +111,18 @@ function spawnKnightAt(spawnPos) {
         // MAYBE: MAX CONTROL LIMIT?
         if(PLAYER.knightUnitCount >= PLAYER.maxKnightUnitCount) { return; }
 
-        if(!clearArea(spawnPos, players, resources, units, knights, mages)) { return; }
+        // Attempt other angles if down is full
+        if(!clearArea(spawnPos, players, resources, units, knights, mages)) { 
+            if (attempt === 0) { spawnPos.y -= 1; spawnPos.x -= 1 } // go to left
+            else if (attempt === 1) { spawnPos.x += 2; } // go to right
+            else if (attempt === 2) { spawnPos.x -= 1; spawnPos.y -= 1} // go to top
 
-        var uuid = Math.random().toString(36).slice(-6);
+            if (attempt < 3) { spawnKnightAt(spawnPos, attempt + 1) };
+
+            return 
+        }
+
+        var uuid = guidGenerator();
 
         knightRef = firebase.database().ref(`knights/${PLAYER.id}:${uuid}`);
 
@@ -110,7 +130,8 @@ function spawnKnightAt(spawnPos) {
             id: `${PLAYER.id}:${uuid}`,
             ownerId: PLAYER.id,
             name: "Knight",
-            health: 50,
+            health: 50 + 7 * PLAYER.stats.healthLevel,
+            maxHealth: 50 + 7 * PLAYER.stats.healthLevel,
             damage: 2,
             color: PLAYER.color,
             bodyType: 4,
@@ -129,7 +150,7 @@ function spawnKnightAt(spawnPos) {
 }
 
 // Purpose: The function that spawns an mage at a given position
-function spawnMageAt(spawnPos) {
+function spawnMageAt(spawnPos, attempt = 0) {
     const mageCosts = mageSpawnCost;
 
     if((PLAYER.resources.gold >= mageCosts.goldCost &&
@@ -140,10 +161,19 @@ function spawnMageAt(spawnPos) {
 
         // MAYBE: MAX CONTROL LIMIT?
         if(PLAYER.mageUnitCount >= PLAYER.maxMageUnitCount) { return; }
+  
+        // Attempt other angles if down is full
+        if(!clearArea(spawnPos, players, resources, units, knights, mages)) { 
+            if (attempt === 0) { spawnPos.y -= 1; spawnPos.x -= 1 } // go to left
+            else if (attempt === 1) { spawnPos.x += 2; } // go to right
+            else if (attempt === 2) { spawnPos.x -= 1; spawnPos.y -= 1} // go to top
 
-        if(!clearArea(spawnPos, players, resources, units, knights, mages)) { return; }
+            if (attempt < 3) { spawnMageAt(spawnPos, attempt + 1) };
 
-        var uuid = Math.random().toString(36).slice(-6);
+            return 
+        }
+
+        var uuid = guidGenerator();
 
         mageRef = firebase.database().ref(`mages/${PLAYER.id}:${uuid}`);
 
@@ -151,7 +181,8 @@ function spawnMageAt(spawnPos) {
             id: `${PLAYER.id}:${uuid}`,
             ownerId: PLAYER.id,
             name: "Mage",
-            health: 20,
+            health: 20 + 3 * PLAYER.stats.healthLevel,
+            maxHealth: 20 + 3 * PLAYER.stats.healthLevel,
             damage: 4,
             color: PLAYER.color,
             bodyType: 5,

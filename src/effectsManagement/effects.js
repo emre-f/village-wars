@@ -1,4 +1,49 @@
-const gameContainer = document.querySelector(".game-container");
+function manageEffects() {
+    const allEffectsRef = firebase.database().ref(`effects`);
+
+    allEffectsRef.on("child_added", (snapshot) => {
+        const eff = snapshot.val();
+        const slashElement = document.createElement("div");
+
+        if(eff.type === "sword-slash") {
+            slashElement.classList.add("sword-slash");
+
+            slashElement.innerHTML = (`
+                <div class="sword-animation-sprite" data-dir=${eff.dir}></div>
+            `);
+            
+            slashElement.style.transform = `translate3d(${eff.left}, ${eff.top}, 0)`;
+            gameContainer.appendChild(slashElement);
+
+            setTimeout(function(){
+                gameContainer.removeChild(slashElement);
+
+                //Remove from DB
+                firebase.database().ref(`effects/${eff.id}`).remove()
+            }, 325); 
+        } else if (eff.type === "fireball") {
+            slashElement.classList.add("fireball");
+
+            slashElement.innerHTML = (`
+                <div class="fireball-animation-sprite" data-target-left=${eff.targetLeft} data-target-top=${eff.targetTop}></div>
+            `);
+            
+            slashElement.style.transform = `translate3d(${eff.left}, ${eff.top}, 0)`;
+            slashElement.style.setProperty('--target-left', eff.targetLeft)
+            slashElement.style.setProperty('--target-top', eff.targetTop)
+
+            gameContainer.appendChild(slashElement);
+
+            setTimeout(function(){
+                gameContainer.removeChild(slashElement);
+
+                //Remove from DB
+                firebase.database().ref(`effects/${eff.id}`).remove()
+            }, 325);
+        }
+        
+    })
+}
 
 function guidGenerator() {
     var S4 = function() {

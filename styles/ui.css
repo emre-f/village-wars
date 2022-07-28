@@ -9,7 +9,7 @@
     color: white;
 }
 
-.player-stats {
+.player-stats, .spawn-menu, .minimap, .message {
     padding: 1em;
     display: flex;
     gap: 0.5em;
@@ -17,15 +17,7 @@
     color: white;
 }
 
-.spawn-menu {
-    padding: 1em;
-    display: flex;
-    gap: 0.5em;
-    align-items: flex-end;
-    color: white;
-}
-
-.player-info, .player-stats, .spawn-menu {
+.player-info, .player-stats, .spawn-menu, .minimap, .message {
     font-size: 24px;
 }
 
@@ -43,7 +35,7 @@
     border-radius: 3px;
 }
 
-.player-reso-table, .player-stats-table, .player-spawn-table {
+.player-reso-table, .player-stats-table, .player-spawn-table, .minimap-cell-holder {
     background: #333;
     color: white;
 
@@ -76,7 +68,7 @@
     line-height: 1;
 }
 
-.spawn-villager-cost-table, .spawn-knight-cost-table {
+.spawn-villager-cost-table, .spawn-knight-cost-table, .spawn-mage-cost-table {
     text-align: center;
 }
 
@@ -130,4 +122,89 @@
     padding:0;
     cursor: pointer;
     color: white;
+}
+
+/* Minimap */
+.minimap {
+    z-index: 2; 
+    position: absolute; 
+    right: 0px; 
+    bottom:0px;
+    border-radius: 6px;
+    padding: 0.5em;
+}
+
+.minimap-frame {
+    background-color: #333;
+    padding: 0.5em;
+    border-radius: 6px;
+}
+
+.minimap-cell-holder {
+    width: 180px;
+    height: 180px;
+    background-color: rgb(15, 70, 15);
+}
+
+.minimap-unit-cell {
+    width: 6px;
+    height: 6px;
+    position: absolute;
+    z-index: 3;
+    border-radius: 6px;
+}
+
+.minimap-unit-cell[data-type="resource"] {
+    background-color: rgb(150, 105, 10);
+}
+
+.minimap-unit-cell[data-type="ground"] {
+    background-color: rgb(15, 70, 15);
+}
+
+.minimap-unit-cell[data-type="you"] {
+    background-color: rgb(255, 255, 255);
+}
+
+.minimap-unit-cell[data-type="ally"] {
+    background-color: rgb(0, 224, 0);
+}
+
+.minimap-unit-cell[data-type="enemy-player"] {
+    background-color: rgb(255, 255, 0);
+}
+
+.minimap-unit-cell[data-type="enemy-unit"] {
+    background-color: rgb(255, 0, 0);
+}
+
+/* MESSAGES */
+.message {
+    z-index: 2; 
+    position: absolute; 
+    top: 20px;
+
+    border-radius: 6px;
+    padding: 1em;
+
+    font-weight: bold;
+    font-size: 18px;
+
+    background: #333;
+    color: white;
+
+    text-transform: uppercase;
+    white-space: nowrap;
+
+    border-radius: 6px;    
+}
+
+.curr-msg {
+    top: 20px;
+    animation: message-move 2s forwards;
+}   
+
+@keyframes message-move {
+    0% { opacity: 1;}
+    100% { opacity: 0; top: 0px; transform: translate3d(0, -15px, 0)}
 }
