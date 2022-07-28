@@ -239,6 +239,7 @@ function generateMap(mapSize) {
                     // COUNT AI UNITS
                     var currVillCount = 0
                     var currKnightCount = 0
+                    var currMagesCount = 0
 
                     Object.keys(units).forEach((key) => {
                         if(units[key].ownerId === playerId) { currVillCount += 1; }
@@ -248,17 +249,26 @@ function generateMap(mapSize) {
                         if(knights[key].ownerId === playerId) { currKnightCount += 1; }
                     })
 
+                    Object.keys(mages).forEach((key) => {
+                        if(mages[key].ownerId === playerId) { currMagesCount += 1; }
+                    })
+
                     playerRef.transaction((obj) => {
-                        obj["villagerUnitCount"] = currVillCount;
-                        obj["knightUnitCount"] = currKnightCount;
+                        obj.villagerUnitCount = currVillCount;
+                        obj.knightUnitCount = currKnightCount;
+                        obj.mageUnitCount = currMagesCount;
                         return obj
                     })
 
                     // UPDATE UI
                     document.querySelector(".curr-villager-count").innerText = characterState.villagerUnitCount;
                     document.querySelector(".max-villager-count").innerText = characterState.maxVillagerUnitCount;
+
                     document.querySelector(".curr-knight-count").innerText = characterState.knightUnitCount;
                     document.querySelector(".max-knight-count").innerText = characterState.maxKnightUnitCount;
+
+                    document.querySelector(".curr-mage-count").innerText = characterState.mageUnitCount;
+                    document.querySelector(".max-mage-count").innerText = characterState.maxMageUnitCount;
                 } 
 
                 el.querySelector(".Character_effects-container").innerHTML = effectsContainer;
