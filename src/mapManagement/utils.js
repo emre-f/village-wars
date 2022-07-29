@@ -1,3 +1,30 @@
+// Purpose: Generate a square shaped map of desired size
+function generateMap(mapSize) {
+
+	perlinNoiseSeed(Math.random());
+
+    // Clear out old unit cells
+    // const allUnitCellsRef = firebase.database().ref(`unitCells`);
+    // const gameContainer = document.querySelector(".game-container");
+
+    for (let x = 0; x < mapSize; x++) {
+        for (let y = 0; y < mapSize; y++) {
+
+			// PERLIN NOISE VALUE
+			var value = perlinNoiseSimplex2(x / 50, y / 50);
+			value = Math.round((value + 1) * 2);
+			value = Math.min(Math.max(value, 1), 4) // clamp between 1 to 3.
+
+            const unitCellRef = firebase.database().ref(`unitCells/${getKeyString(x, y)}`);
+			unitCellRef.set({
+				x,
+				y,
+				heightValue: value
+			})
+        }
+    }
+}
+
 function isOccupiedByPlayer(x, y, playersArray) {
 	for (let p in playersArray) {
 		if (x === playersArray[p].x && y === playersArray[p].y) {

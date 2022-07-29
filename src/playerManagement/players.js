@@ -18,7 +18,7 @@ function managePlayers() {
             if (nobodyIsAdminPlayer) {
                 let newAdminPlayer = players[Object.keys(players)[0]];
 
-                if(typeof newAdminPlayer.id !== 'undefined') {
+                if(typeof newAdminPlayer.id !== 'undefined') { 
                     console.log("New Admin Player: " + newAdminPlayer.name + " (ID: " + newAdminPlayer.id + ")");
 
                     let ref = firebase.database().ref(`players/${newAdminPlayer.id}`);

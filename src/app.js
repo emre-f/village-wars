@@ -1,10 +1,21 @@
 (function () {
+    let currentKeysPressed = {};
 
     document.addEventListener("keydown", (e) => {
         var dir = keys[e.which];
         if (dir && held_directions.indexOf(dir) === -1) {
             held_directions.unshift(dir)
         }
+
+        if(currentKeysPressed['z'] && currentKeysPressed['x'] && event.key === '8') {
+            generateMap(MAP_SIZE);
+            console.log("ADMIN: NEW MAP GENERATED")
+        } else if (currentKeysPressed['z'] && currentKeysPressed['x'] && event.key === '9') {
+            GOD_MODE = !GOD_MODE; // flip god mode
+            console.log("ADMIN: GOD_MODE is " + GOD_MODE)
+        }
+
+        currentKeysPressed[event.key] = true;
     })
     
     document.addEventListener("keyup", (e) => {
@@ -13,6 +24,8 @@
         if (index > -1) {
             held_directions.splice(index, 1)
         }
+
+        delete currentKeysPressed[event.key];
     });
 
     const step = (timestamp) => {
@@ -51,7 +64,8 @@
 
     function initGame() {
 
-        generateMap(MAP_SIZE); 
+        // Only generate if you are admitted as the admin! (see players.js)
+        // generateMap(MAP_SIZE); 
 
         // var setMinimapInterval = setInterval(() => {
         //     if(Object.keys(unitCells).length === 0 || unitCells[Object.keys(unitCells)[0]].x == null) { return; }

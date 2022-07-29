@@ -89,7 +89,37 @@ body {
 }
 
 .Unit-cell-sprite {
-    background: url(../images/Tile/medievalTile_57.png) no-repeat no-repeat;
     image-rendering: pixelated;
+
+    /* to cover around edges, no "leaking" when moving */
+    transform:scale(2);
 }
 
+/* sand */
+.unit-cell[data-height="1"][data-sprite-variant="1"] .Unit-cell-sprite {
+    background: url(../images/Tile/medievalTile_01.png) no-repeat no-repeat;
+}
+.unit-cell[data-height="1"][data-sprite-variant="2"] .Unit-cell-sprite {
+    background: url(../images/Tile/medievalTile_02.png) no-repeat no-repeat;
+}
+/* dirt */
+.unit-cell[data-height="2"][data-sprite-variant="1"] .Unit-cell-sprite {
+    background: url(../images/Tile/medievalTile_13.png) no-repeat no-repeat;
+}
+.unit-cell[data-height="2"][data-sprite-variant="2"] .Unit-cell-sprite {
+    background: url(../images/Tile/medievalTile_14.png) no-repeat no-repeat;
+}
+/* grass */
+.unit-cell[data-height="3"][data-sprite-variant="1"] .Unit-cell-sprite {
+    background: url(../images/Tile/medievalTile_57.png) no-repeat no-repeat;
+}
+.unit-cell[data-height="3"][data-sprite-variant="2"] .Unit-cell-sprite {
+    background: url(../images/Tile/medievalTile_58.png) no-repeat no-repeat;
+}
+/* stone */
+.unit-cell[data-height="4"][data-sprite-variant="1"] .Unit-cell-sprite {
+    background: url(../images/Tile/medievalTile_15.png) no-repeat no-repeat;
+}
+.unit-cell[data-height="4"][data-sprite-variant="2"] .Unit-cell-sprite {
+    background: url(../images/Tile/medievalTile_16.png) no-repeat no-repeat;
+}

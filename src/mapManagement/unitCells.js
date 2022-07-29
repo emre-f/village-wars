@@ -1,23 +1,3 @@
-// Purpose: Generate a square shaped map of desired size
-function generateMap(mapSize) {
-    // Clear out old unit cells
-    // const allUnitCellsRef = firebase.database().ref(`unitCells`);
-    // const gameContainer = document.querySelector(".game-container");
-
-    for (let x = 0; x < mapSize; x++) {
-        for (let y = 0; y < mapSize; y++) {
-
-            const unitCellRef = firebase.database().ref(`unitCells/${getKeyString(x, y)}`);
-			unitCellRef.set({
-				x,
-				y,
-			})
-
-            
-        }
-    }
-}
-
 // Purpose: Networking/Managing all ground cells on the DB
 function manageUnitCells() {
 
@@ -45,6 +25,9 @@ function manageUnitCells() {
         unitCellElement.innerHTML = `
             <div class="Unit-cell-sprite grid-cell"></div>
         `;
+
+        unitCellElement.setAttribute("data-height", unitCell.heightValue);
+        unitCellElement.setAttribute("data-sprite-variant", randomFromArray([1, 2]));
 
         // Position the Element
         const left = 64 * unitCell.x + "px";
