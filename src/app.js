@@ -181,7 +181,7 @@
                         house: 0,
                         barracks: 0,
                         mageTower: 0,
-                        townCenterId: "none"
+                        castleId: "none"
                     },
                     color: randomFromArray(["blue", "orange", "green", "gray"]),
                     bodyType,

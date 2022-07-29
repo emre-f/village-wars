@@ -68,15 +68,15 @@ function managePlayers() {
             // Remove your player if health is less than 0
             if(characterState.health <= 0) {
                 // IF you have a town center, max your health and teleport to it. Destroy your town center
-                if(characterState.buildings.townCenterId !== "none") {
-                    let townCenter = buildings[characterState.buildings.townCenterId];
+                if(characterState.buildings.castleId !== "none") {
+                    let castle = buildings[characterState.buildings.castleId];
 
-                    if(townCenter == null) { return; }
+                    if(castle == null) { return; }
                     // Teleport to your town centers location
                     firebase.database().ref(`players/${characterState.id}`).transaction((obj) => { if (obj == null) { return }
                         obj.health = obj.maxHealth;
-                        obj.x = townCenter.x;
-                        obj.y = townCenter.y;
+                        obj.x = castle.x;
+                        obj.y = castle.y;
 
                         obj.resources.gold = Math.min(obj.resources.gold, Math.round(obj.resources.gold * 0.4));
                         obj.resources.wood = Math.min(obj.resources.wood, Math.round(obj.resources.wood * 0.4));
@@ -85,8 +85,8 @@ function managePlayers() {
                     });
 
                     // Find your town center and destroy it
-                    firebase.database().ref(`buildings/${characterState.buildings.townCenterId}`).remove();
-                    addMessageToQueue(characterState.name + " ran to his Town Center &#127984; ");
+                    firebase.database().ref(`buildings/${characterState.buildings.castleId}`).remove();
+                    addMessageToQueue(characterState.name + " ran to his Castle &#127984; ");
                     return;
                 }
 
@@ -121,8 +121,8 @@ function managePlayers() {
                 var currentHouseCount = 0
                 var currentBarracksCount = 0
                 var currentMageTowerCount = 0
-                var currentTownCenterCount = 0
-                var currentTownCenterId = "none"
+                var currentCastleCount = 0
+                var currentCastleId = "none"
 
                 Object.keys(units).forEach((key) => {
                     if(units[key] != null && units[key].ownerId === playerId) { currVillCount += 1; }
@@ -144,9 +144,9 @@ function managePlayers() {
                             currentBarracksCount += 1;
                         } else if (buildings[key].buildingType === "mage-tower") {
                             currentMageTowerCount += 1;
-                        } else if (buildings[key].buildingType === "town-center") {
-                            currentTownCenterCount += 1;
-                            currentTownCenterId = key;
+                        } else if (buildings[key].buildingType === "castle") {
+                            currentCastleCount += 1;
+                            currentCastleId = key;
                         }
                     }
                 })
@@ -158,7 +158,7 @@ function managePlayers() {
                     obj.buildings.house = currentHouseCount;
                     obj.buildings.barracks = currentBarracksCount;
                     obj.buildings.mageTower = currentMageTowerCount;
-                    obj.buildings.townCenterId = currentTownCenterId;
+                    obj.buildings.castleId = currentCastleId;
 
                     // Update your max count according to your buildings
                     obj.units.villager.max = 3 + currentHouseCount;
@@ -180,7 +180,7 @@ function managePlayers() {
                 document.querySelector(".curr-house-count").innerText = characterState.buildings.house;
                 document.querySelector(".curr-barracks-count").innerText = characterState.buildings.barracks;
                 document.querySelector(".curr-mage-tower-count").innerText = characterState.buildings.mageTower;
-                document.querySelector(".curr-town-center-count").innerText = currentTownCenterCount;
+                document.querySelector(".curr-castle-count").innerText = currentCastleCount;
             } 
 
             el.querySelector(".Character_effects-container").innerHTML = effectsContainer;

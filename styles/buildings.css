@@ -29,8 +29,8 @@
     background: url(../images/Structure/medievalStructure_19.png);
 }
 /* TOWN CENTER */
-.Building[data-building-type="town-center"] .Building_sprite {
-    background: url(../images/Structure/townCenter.png);
+.Building[data-building-type="castle"] .Building_sprite {
+    background: url(../images/Structure/castle.png);
     height: 96px;
     top: -24px;
 }
