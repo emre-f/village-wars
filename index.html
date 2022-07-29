@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="styles/styles.css" type="text/css">
     <link rel="stylesheet" href="styles/characters.css" type="text/css">
     <link rel="stylesheet" href="styles/resources.css" type="text/css">
+    <link rel="stylesheet" href="styles/buildings.css" type="text/css">
     <link rel="stylesheet" href="styles/ui.css" type="text/css">
   </head>
   <body>
@@ -299,7 +300,33 @@
                 </tr>
                 <tr>
                   <td colspan="2">
-                    <div style="text-align:center; font-weight:bold;"> <span class="curr-villager-count"></span>/<span class="max-villager-count"></span> </div>
+                    <div style="text-align:center; font-weight:bold; margin-top: -5px;"> <span class="curr-villager-count">0</span>/<span class="max-villager-count">3</span> </div>
+                  </td>
+                </tr>
+              </table>
+            </button>
+          </td>
+
+          <!-- HOUSE -->
+          <td>
+            <button class="spawn-unit-button spawn-house-button">
+              <table class="player-spawn-table-single-item">
+                <tr>
+                  <!-- IMAGE -->
+                  <td>
+                    <div class="spawn-table-img-building" id="house-image"></div>
+                  </td>
+                  <!-- COSTS -->
+                  <td>
+                    <table class="spawn-house-cost-table" style="margin-left:-15px;">
+                      <tr><td><span class="wood-cost">200</span>&#127795; &nbsp;&nbsp;</td></tr>
+                      <tr><td><span class="meat-cost">50</span>&#127830; &nbsp;&nbsp;</td></tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="2">
+                    <div style="text-align:center; font-weight:bold; margin-top: -5px;"> <span class="curr-house-count">0</span> </div>
                   </td>
                 </tr>
               </table>
@@ -326,7 +353,33 @@
                 </tr>
                 <tr>
                   <td colspan="2">
-                    <div style="text-align:center; font-weight:bold;"> <span class="curr-knight-count"></span>/<span class="max-knight-count"></span> </div>
+                    <div style="text-align:center; font-weight:bold; margin-top: -5px;"> <span class="curr-knight-count">0</span>/<span class="max-knight-count">3</span> </div>
+                  </td>
+                </tr>
+              </table>
+            </button>
+          </td>
+
+          <!-- BARRACKS -->
+          <td>
+            <button class="spawn-unit-button spawn-barracks-button">
+              <table class="player-spawn-table-single-item">
+                <tr>
+                  <!-- IMAGE -->
+                  <td>
+                    <div class="spawn-table-img-building" id="barracks-image"></div>
+                  </td>
+                  <!-- COSTS -->
+                  <td>
+                    <table class="spawn-barracks-cost-table" style="margin-left:-15px;">
+                      <tr><td><span class="gold-cost">100</span>&#128511; &nbsp;&nbsp;</td></tr>
+                      <tr><td><span class="wood-cost">200</span>&#127795; &nbsp;&nbsp;</td></tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="2">
+                    <div style="text-align:center; font-weight:bold; margin-top: -5px;"> <span class="curr-barracks-count">0</span> </div>
                   </td>
                 </tr>
               </table>
@@ -353,7 +406,33 @@
                 </tr>
                 <tr>
                   <td colspan="2">
-                    <div style="text-align:center; font-weight:bold;"> <span class="curr-mage-count">0</span>/<span class="max-mage-count">3</span> </div>
+                    <div style="text-align:center; font-weight:bold; margin-top: -5px;"> <span class="curr-mage-count">0</span>/<span class="max-mage-count">3</span> </div>
+                  </td>
+                </tr>
+              </table>
+            </button>
+          </td>
+
+          <!-- MAGE TOWER -->
+          <td>
+            <button class="spawn-unit-button spawn-mage-tower-button">
+              <table class="player-spawn-table-single-item">
+                <tr>
+                  <!-- IMAGE -->
+                  <td>
+                    <div class="spawn-table-img-building" id="mage-tower-image"></div>
+                  </td>
+                  <!-- COSTS -->
+                  <td>
+                    <table class="spawn-mage-tower-cost-table" style="margin-left:-15px;">
+                      <tr><td><span class="gold-cost">100</span>&#128511; &nbsp;&nbsp;</td></tr>
+                      <tr><td><span class="meat-cost">100</span>&#127830; &nbsp;&nbsp;</td></tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="2">
+                    <div style="text-align:center; font-weight:bold; margin-top: -5px;"> <span class="curr-mage-tower-count">0</span> </div>
                   </td>
                 </tr>
               </table>
@@ -414,5 +493,8 @@
     <script src="src/unitManagement/mages.js"></script>
 
     <script src="src/effectsManagement/effects.js"></script>
+
+    <script src="src/buildingManagement/buildings.js"></script>
+    <script src="src/buildingManagement/spawnButtons.js"></script>
   </body>
 </html>

@@ -66,9 +66,11 @@
         manageKnights();
         manageMages();
         manageEffects();
+        manageBuildings();
 
         setupUpgradeButtons();
         setupSpawnButtons();   
+        setupBuildingSpawnButtons();
         setMinimap();
 
         step(); 
@@ -97,6 +99,13 @@
                     const characterState = mages[key];
                     if(characterState.ownerId === user.uid) {
                         firebase.database().ref(`mages/${key}`).remove()
+                    }
+                })
+
+                Object.keys(buildings).forEach((key) => {
+                    const characterState = buildings[key];
+                    if(characterState.ownerId === user.uid) {
+                        firebase.database().ref(`buildings/${key}`).remove()
                     }
                 })
 
@@ -139,12 +148,25 @@
                         chopLevel: 0,
                         huntLevel: 0,
                     },
-                    villagerUnitCount: 0,
-                    maxVillagerUnitCount: 3,
-                    knightUnitCount: 0,
-                    maxKnightUnitCount: 3,
-                    mageUnitCount: 0,
-                    maxMageUnitCount: 3,
+                    units: {
+                        villager: {
+                            current: 0,
+                            max: 3,
+                        },
+                        knight: {
+                            current: 0,
+                            max: 3,
+                        },
+                        mage: {
+                            current: 0,
+                            max: 3
+                        }
+                    },
+                    buildings: {
+                        house: 0,
+                        barracks: 0,
+                        mageTower: 0,
+                    },
                     color: randomFromArray(["blue", "orange", "green", "gray"]),
                     bodyType,
                     x,

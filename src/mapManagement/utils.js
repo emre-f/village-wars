@@ -31,7 +31,7 @@ function getRandomSafeSpot() {
 	}
 }
 
-function clearArea(pos, playersArray, resourcesArray, unitsArray, knightsArray, magesArray) {
+function clearArea(pos, playersArray, resourcesArray, unitsArray, knightsArray, magesArray, buildingsArray) {
 
 	if (pos.x < 0 || pos.x >= MAP_SIZE || pos.y < 0 || pos.y >= MAP_SIZE) { 
 		return false 
@@ -41,5 +41,6 @@ function clearArea(pos, playersArray, resourcesArray, unitsArray, knightsArray, 
 			!isOccupiedByPlayer(pos.x, pos.y, resourcesArray) &&
 			!isOccupiedByPlayer(pos.x, pos.y, unitsArray) &&
 			!isOccupiedByPlayer(pos.x, pos.y, knightsArray) &&
-            !isOccupiedByPlayer(pos.x, pos.y, magesArray));
+            !isOccupiedByPlayer(pos.x, pos.y, magesArray) &&
+			!isOccupiedByPlayer(pos.x, pos.y, buildingsArray));
 }

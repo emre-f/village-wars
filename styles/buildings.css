@@ -1,0 +1,75 @@
+.Building {
+    transition: transform 0.4s;
+}
+
+.Building {
+    width: calc( var(--grid-cell)* 2 );
+    height: calc( var(--grid-cell)* 2 );
+    position: absolute;
+
+    /* Hiding it makes the name panels invisible */
+    /* overflow:hidden; */
+}
+
+.Building_sprite {
+    overflow: hidden;
+    top: -3px;
+}
+
+/* HOUSE */
+.Building[data-building-type="house"] .Building_sprite {
+    background: url(../images/Structure/medievalStructure_17.png);
+}
+/* BARRACKS */
+.Building[data-building-type="barracks"] .Building_sprite {
+    background: url(../images/Structure/medievalStructure_20.png);
+}
+/* MAGE TOWER */
+.Building[data-building-type="mage-tower"] .Building_sprite {
+    background: url(../images/Structure/medievalStructure_19.png);
+}
+
+.Building_shadow {
+    background: url(../images/Unit/shadow.png) no-repeat no-repeat;
+    transform: scale(3);
+    top: 80px;
+    left: 70px;
+}
+
+.Building_name-container {
+    position: absolute;
+    top: -18px;
+    left: 25px;
+    font-size: 6px;
+    padding: 1px 2px 1px;
+    border-radius: 3px;
+    background: #333;
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transform: scale(2);
+}
+
+.Building_effects-container {
+    position: absolute;
+    top: -36px;
+    left: 26px;
+    font-size: 6px;
+    padding: 1px 2px 1px;
+    border-radius: 3px;
+    background: rgba(1, 1, 1, 0);
+    color: #333;
+    font-weight: bold;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transform: scale(2);
+}
+
+/* .Character[you="true"] .Character_name-container {
+    color: rgb(72, 255, 0);
+} */
+
+.Building_health {
+    /* color: rgb(72, 255, 0); */
+}

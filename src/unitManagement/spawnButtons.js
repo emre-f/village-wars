@@ -57,10 +57,10 @@ function spawnVillagerAt(spawnPos, attempt = 0) {
         {
 
         // Can control max 3 villagers
-        if(PLAYER.villagerUnitCount >= PLAYER.maxVillagerUnitCount) { return; }
+        if(PLAYER.units.villager.current >= PLAYER.units.villager.max) { return; }
 
         // Attempt other angles if down is full
-        if(!clearArea(spawnPos, players, resources, units, knights, mages)) { 
+        if(!clearArea(spawnPos, players, resources, units, knights, mages, buildings)) { 
             if (attempt === 0) { spawnPos.y -= 1; spawnPos.x -= 1 } // go to left
             else if (attempt === 1) { spawnPos.x += 2; } // go to right
             else if (attempt === 2) { spawnPos.x -= 1; spawnPos.y -= 1} // go to top
@@ -72,11 +72,11 @@ function spawnVillagerAt(spawnPos, attempt = 0) {
 
         var uuid = guidGenerator();
 
-        unitRef = firebase.database().ref(`units/${PLAYER.id}:${PLAYER.villagerUnitCount}:${uuid}`);
+        unitRef = firebase.database().ref(`units/${PLAYER.id}:${PLAYER.units.villager.current}:${uuid}`);
 
         unitRef.set({
-            id: `${PLAYER.id}:${PLAYER.villagerUnitCount}:${uuid}`,
-            number: PLAYER.villagerUnitCount,
+            id: `${PLAYER.id}:${PLAYER.units.villager.current}:${uuid}`,
+            number: PLAYER.units.villager.current,
             ownerId: PLAYER.id,
             name: "Villager",
             health: 20 + 3 * PLAYER.stats.healthLevel,
@@ -109,10 +109,10 @@ function spawnKnightAt(spawnPos, attempt = 0) {
         {
 
         // MAYBE: MAX CONTROL LIMIT?
-        if(PLAYER.knightUnitCount >= PLAYER.maxKnightUnitCount) { return; }
+        if(PLAYER.units.knight.current >= PLAYER.units.knight.max) { return; }
 
         // Attempt other angles if down is full
-        if(!clearArea(spawnPos, players, resources, units, knights, mages)) { 
+        if(!clearArea(spawnPos, players, resources, units, knights, mages, buildings)) { 
             if (attempt === 0) { spawnPos.y -= 1; spawnPos.x -= 1 } // go to left
             else if (attempt === 1) { spawnPos.x += 2; } // go to right
             else if (attempt === 2) { spawnPos.x -= 1; spawnPos.y -= 1} // go to top
@@ -160,10 +160,10 @@ function spawnMageAt(spawnPos, attempt = 0) {
         {
 
         // MAYBE: MAX CONTROL LIMIT?
-        if(PLAYER.mageUnitCount >= PLAYER.maxMageUnitCount) { return; }
+        if(PLAYER.units.mage.current >= PLAYER.units.mage.max) { return; }
   
         // Attempt other angles if down is full
-        if(!clearArea(spawnPos, players, resources, units, knights, mages)) { 
+        if(!clearArea(spawnPos, players, resources, units, knights, mages, buildings)) { 
             if (attempt === 0) { spawnPos.y -= 1; spawnPos.x -= 1 } // go to left
             else if (attempt === 1) { spawnPos.x += 2; } // go to right
             else if (attempt === 2) { spawnPos.x -= 1; spawnPos.y -= 1} // go to top

@@ -46,6 +46,9 @@ var resetTargetsTimerCD = 8;
 var minimapUpdateTimer = 0.2;
 var minimapUpdateTimerCD = 0.2;
 
+let buildings = {};
+let buildingElements = {};
+
 let test = "xyz"
 
 //

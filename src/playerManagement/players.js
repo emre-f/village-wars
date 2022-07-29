@@ -73,7 +73,7 @@ function managePlayers() {
                     addMessageToQueue(characterState.name + " &#9876;&#65039; " + players[characterState.lastDamagedById].name);
                     stealResources(characterState.lastDamagedById, characterState)
                 }
-                
+
                 firebase.database().ref(`players/${characterState.id}`).remove();
             }
 
@@ -95,6 +95,10 @@ function managePlayers() {
                 var currKnightCount = 0
                 var currMagesCount = 0
 
+                var currentHouseCount = 0
+                var currentBarracksCount = 0
+                var currentMageTowerCount = 0
+
                 Object.keys(units).forEach((key) => {
                     if(units[key] != null && units[key].ownerId === playerId) { currVillCount += 1; }
                 })
@@ -107,22 +111,46 @@ function managePlayers() {
                     if(mages[key] != null && mages[key].ownerId === playerId) { currMagesCount += 1; }
                 })
 
+                Object.keys(buildings).forEach((key) => {
+                    if(buildings[key] != null && buildings[key].ownerId === playerId) { 
+                        if(buildings[key].buildingType === "house") {
+                            currentHouseCount += 1;
+                        } else if (buildings[key].buildingType === "barracks") {
+                            currentBarracksCount += 1;
+                        } else if (buildings[key].buildingType === "mage-tower") {
+                            currentMageTowerCount += 1;
+                        }
+                    }
+                })
+
                 playerRef.transaction((obj) => { if (obj == null) { return }
-                    obj.villagerUnitCount = currVillCount;
-                    obj.knightUnitCount = currKnightCount;
-                    obj.mageUnitCount = currMagesCount;
+                    obj.units.villager.current = currVillCount;
+                    obj.units.knight.current = currKnightCount;
+                    obj.units.mage.current = currMagesCount;
+                    obj.buildings.house = currentHouseCount;
+                    obj.buildings.barracks = currentBarracksCount;
+                    obj.buildings.mageTower = currentMageTowerCount;
+
+                    // Update your max count according to your buildings
+                    obj.units.villager.max = 3 + currentHouseCount;
+                    obj.units.knight.max = 3 + currentBarracksCount * 2;
+                    obj.units.mage.max = 3 + currentMageTowerCount * 2;
                     return obj
                 })
 
                 // UPDATE UI
-                document.querySelector(".curr-villager-count").innerText = characterState.villagerUnitCount;
-                document.querySelector(".max-villager-count").innerText = characterState.maxVillagerUnitCount;
+                document.querySelector(".curr-villager-count").innerText = characterState.units.villager.current;
+                document.querySelector(".max-villager-count").innerText = characterState.units.villager.max;
 
-                document.querySelector(".curr-knight-count").innerText = characterState.knightUnitCount;
-                document.querySelector(".max-knight-count").innerText = characterState.maxKnightUnitCount;
+                document.querySelector(".curr-knight-count").innerText = characterState.units.knight.current;
+                document.querySelector(".max-knight-count").innerText = characterState.units.knight.max;
 
-                document.querySelector(".curr-mage-count").innerText = characterState.mageUnitCount;
-                document.querySelector(".max-mage-count").innerText = characterState.maxMageUnitCount;
+                document.querySelector(".curr-mage-count").innerText = characterState.units.mage.current;
+                document.querySelector(".max-mage-count").innerText = characterState.units.mage.max;
+      
+                document.querySelector(".curr-house-count").innerText = characterState.buildings.house;
+                document.querySelector(".curr-barracks-count").innerText = characterState.buildings.barracks;
+                document.querySelector(".curr-mage-tower-count").innerText = characterState.buildings.mageTower;
             } 
 
             el.querySelector(".Character_effects-container").innerHTML = effectsContainer;
@@ -135,7 +163,7 @@ function managePlayers() {
         Object.keys(units).forEach((key) => {
             const characterState = units[key];
 
-            if(!characterState.ownerId in players) {
+            if(!(characterState.ownerId in players)) {
                 firebase.database().ref(`units/${key}`).remove()
             }
         })
@@ -143,7 +171,7 @@ function managePlayers() {
         Object.keys(knights).forEach((key) => {
             const characterState = knights[key];
 
-            if(!characterState.ownerId in players) {
+            if(!(characterState.ownerId in players)) {
                 firebase.database().ref(`knights/${key}`).remove()
             }
         })
@@ -151,8 +179,16 @@ function managePlayers() {
         Object.keys(mages).forEach((key) => {
             const characterState = mages[key];
 
-            if(!characterState.ownerId in players) {
+            if(!(characterState.ownerId in players)) {
                 firebase.database().ref(`mages/${key}`).remove()
+            }
+        })
+
+        Object.keys(buildings).forEach((key) => {
+            const characterState = buildings[key];
+
+            if(!(characterState.ownerId in players)) {
+                firebase.database().ref(`buildings/${key}`).remove()
             }
         })
     })
@@ -262,8 +298,10 @@ function moveCharacter() {
                     obj.health = obj.health - PLAYER.damage;
                     return obj
                 })
+
+                swordSlash( { x: PLAYER.x, y: PLAYER.y }, {x: hitUnit.x, y: hitUnit.y } );
             } 
-            swordSlash( { x: PLAYER.x, y: PLAYER.y }, {x: hitUnit.x, y: hitUnit.y } );
+            
             return;
         }
 
@@ -275,8 +313,10 @@ function moveCharacter() {
                     obj.health = obj.health - PLAYER.damage;
                     return obj
                 })
+
+                swordSlash( { x: PLAYER.x, y: PLAYER.y }, {x: hitKnight.x, y: hitKnight.y } );
             } 
-            swordSlash( { x: PLAYER.x, y: PLAYER.y }, {x: hitKnight.x, y: hitKnight.y } );
+            
             return;
         }
 
@@ -288,8 +328,25 @@ function moveCharacter() {
                     obj.health = obj.health - PLAYER.damage;
                     return obj
                 })
+
+                swordSlash( { x: PLAYER.x, y: PLAYER.y }, {x: hitMage.x, y: hitMage.y } );
             } 
-            swordSlash( { x: PLAYER.x, y: PLAYER.y }, {x: hitMage.x, y: hitMage.y } );
+            
+            return;
+        }
+
+        var hitBuilding = isOccupiedByPlayer(newX, newY, buildings)
+
+        if (hitBuilding) {
+            if (hitBuilding.ownerId !== playerId) { // If not your unit, damage it
+                firebase.database().ref(`buildings/${hitBuilding.id}`).transaction((obj) => { if (obj == null) { return }
+                    obj.health = obj.health - PLAYER.damage;
+                    return obj
+                })
+
+                swordSlash( { x: PLAYER.x, y: PLAYER.y }, {x: hitBuilding.x, y: hitBuilding.y } );
+            } 
+            
             return;
         }
 

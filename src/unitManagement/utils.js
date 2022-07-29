@@ -40,6 +40,15 @@ function getTargets() {
         if( PLAYER && mages[key].ownerId === PLAYER.lastDamagedId ) { ownerTargets.push( { x: mages[key].x, y: mages[key].y } ) };
     })
 
+    Object.keys(buildings).forEach((key) => {
+        if( buildings[key] == null || buildings[key].ownerId === playerId) { return; }
+        var result = buildings[key];
+        result["tribe"] = "buildings";
+        allPotentialTargetPos.push(result);
+
+        if( PLAYER && buildings[key].ownerId === PLAYER.lastDamagedId ) { ownerTargets.push( { x: buildings[key].x, y: buildings[key].y } ) };
+    })
+
     return {
         allPotentialTargetPos,
         ownerTargets

@@ -274,6 +274,21 @@ function moveMage(characterState, way, reTry = true) {
 
         return;
     }
+
+    var hitBuilding = isOccupiedByPlayer(newPos.x, newPos.y, buildings)
+
+    if (hitBuilding) {
+        if (hitBuilding.ownerId !== playerId) { // If not your unit, damage it
+            firebase.database().ref(`buildings/${hitBuilding.id}`).transaction((obj) => { if (obj == null) { return }
+                obj.health = obj.health - dmg;
+                return obj
+            })
+
+            swordSlash( { x: characterState.x, y: characterState.y }, {x: hitBuilding.x, y: hitBuilding.y } );
+        } 
+        
+        return;
+    }
         
     // Not hitting anything... move
     mageRef.transaction((obj) => { if (obj == null) { return } 

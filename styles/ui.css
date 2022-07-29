@@ -1,3 +1,7 @@
+button {
+    outline: none;
+}
+
 .player-info {
     position: absolute;
     top: 0;
@@ -80,12 +84,11 @@
     bottom:0px;
 }
 
-.spawn-table-img {
+.spawn-table-img, .spawn-table-img-building {
     width: 64px;
     height: 64px;
     background-color: red;
     margin: 5px;
-    
 }
 
 .spawn-table-img {
@@ -135,7 +138,7 @@
 }
 
 .minimap-frame {
-    background-color: #333;
+    background-color: #222;
     padding: 0.5em;
     border-radius: 6px;
 }
@@ -155,7 +158,7 @@
 }
 
 .minimap-unit-cell[data-type="resource"] {
-    background-color: rgb(150, 105, 10);
+    background-color: rgb(80, 80, 80);
 }
 
 .minimap-unit-cell[data-type="ground"] {
@@ -164,6 +167,14 @@
 
 .minimap-unit-cell[data-type="you"] {
     background-color: rgb(255, 255, 255);
+}
+
+.minimap-unit-cell[data-type="ally-building"] {
+    background-color: rgb(100, 190, 110);
+}
+
+.minimap-unit-cell[data-type="enemy-building"] {
+    background-color: rgb(150, 105, 10);
 }
 
 .minimap-unit-cell[data-type="ally"] {
@@ -207,4 +218,22 @@
 @keyframes message-move {
     0% { opacity: 1;}
     100% { opacity: 0; top: 0px; transform: translate3d(0, -15px, 0)}
+}
+
+/* BUILDINGS */
+
+.spawn-table-img-building {
+    image-rendering: pixelated;
+}
+
+#house-image.spawn-table-img-building {
+    background: url(../images/Structure/medievalStructure_17.png) no-repeat no-repeat;
+}
+
+#barracks-image.spawn-table-img-building {
+    background: url(../images/Structure/medievalStructure_20.png) no-repeat no-repeat;
+}
+
+#mage-tower-image.spawn-table-img-building {
+    background: url(../images/Structure/medievalStructure_19.png) no-repeat no-repeat;
 }
