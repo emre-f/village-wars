@@ -243,7 +243,7 @@ const mageTowerCost = {
 }
 
 const townCenterCost = {
-    goldCost: 500,
-    woodCost: 500,
-    meatCost: 500,
+    goldCost: 400,
+    woodCost: 400,
+    meatCost: 400,
 }

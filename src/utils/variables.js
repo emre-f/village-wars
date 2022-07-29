@@ -1,7 +1,7 @@
 const FPS = 60;
 let lastTimestamp = 0;
 
-GOD_MODE = true; // Free upgrades and unit spawns
+GOD_MODE = false; // Free upgrades and unit spawns
 const MAP_SIZE = 30;
 const MAX_RESOURCE_ON_MAP = 80;
 var BASE_COLLECT_SPEED = 5;
