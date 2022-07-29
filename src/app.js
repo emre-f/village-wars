@@ -1,4 +1,5 @@
 (function () {
+
     document.addEventListener("keydown", (e) => {
         var dir = keys[e.which];
         if (dir && held_directions.indexOf(dir) === -1) {

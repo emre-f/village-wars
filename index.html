@@ -282,7 +282,8 @@
         <tr>
           <!-- VILLAGER -->
           <td>
-            <button class="spawn-unit-button spawn-villager-button">
+            <button class="spawn-unit-button spawn-villager-button" 
+                    title="A button with very long text as in a long title of some sort or other">
               <table class="player-spawn-table-single-item">
                 <tr>
                   <!-- IMAGE -->
@@ -523,5 +524,11 @@
 
     <script src="src/buildingManagement/buildings.js"></script>
     <script src="src/buildingManagement/spawnButtons.js"></script>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script type="text/javascript">
+      $(document).tooltip({show: null});
+    </script>
   </body>
 </html>
