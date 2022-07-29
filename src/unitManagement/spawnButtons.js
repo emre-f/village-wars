@@ -108,7 +108,6 @@ function spawnKnightAt(spawnPos, attempt = 0) {
         GOD_MODE) 
         {
 
-        // MAYBE: MAX CONTROL LIMIT?
         if(PLAYER.units.knight.current >= PLAYER.units.knight.max) { return; }
 
         // Attempt other angles if down is full

@@ -28,6 +28,12 @@
 .Building[data-building-type="mage-tower"] .Building_sprite {
     background: url(../images/Structure/medievalStructure_19.png);
 }
+/* TOWN CENTER */
+.Building[data-building-type="town-center"] .Building_sprite {
+    background: url(../images/Structure/townCenter.png);
+    height: 96px;
+    top: -24px;
+}
 
 .Building_shadow {
     background: url(../images/Unit/shadow.png) no-repeat no-repeat;
@@ -38,7 +44,7 @@
 
 .Building_name-container {
     position: absolute;
-    top: -18px;
+    top: 20px;
     left: 25px;
     font-size: 6px;
     padding: 1px 2px 1px;
@@ -53,7 +59,7 @@
 
 .Building_effects-container {
     position: absolute;
-    top: -36px;
+    top: 2px;
     left: 26px;
     font-size: 6px;
     padding: 1px 2px 1px;
@@ -64,12 +70,4 @@
     text-transform: uppercase;
     white-space: nowrap;
     transform: scale(2);
-}
-
-/* .Character[you="true"] .Character_name-container {
-    color: rgb(72, 255, 0);
-} */
-
-.Building_health {
-    /* color: rgb(72, 255, 0); */
 }

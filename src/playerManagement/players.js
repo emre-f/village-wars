@@ -67,6 +67,29 @@ function managePlayers() {
 
             // Remove your player if health is less than 0
             if(characterState.health <= 0) {
+                // IF you have a town center, max your health and teleport to it. Destroy your town center
+                if(characterState.buildings.townCenterId !== "none") {
+                    let townCenter = buildings[characterState.buildings.townCenterId];
+
+                    if(townCenter == null) { return; }
+                    // Teleport to your town centers location
+                    firebase.database().ref(`players/${characterState.id}`).transaction((obj) => { if (obj == null) { return }
+                        obj.health = obj.maxHealth;
+                        obj.x = townCenter.x;
+                        obj.y = townCenter.y;
+
+                        obj.resources.gold = Math.min(obj.resources.gold, Math.round(obj.resources.gold * 0.4));
+                        obj.resources.wood = Math.min(obj.resources.wood, Math.round(obj.resources.wood * 0.4));
+                        obj.resources.meat = Math.min(obj.resources.meat, Math.round(obj.resources.meat * 0.4));
+                        return obj;
+                    });
+
+                    // Find your town center and destroy it
+                    firebase.database().ref(`buildings/${characterState.buildings.townCenterId}`).remove();
+                    addMessageToQueue(characterState.name + " ran to his Town Center &#127984; ");
+                    return;
+                }
+
                 // Give your resources to your killer
                 if (characterState.lastDamagedById !== "none") {
                     console.log(characterState.name + " was killed by " + players[characterState.lastDamagedById].name)
@@ -98,6 +121,8 @@ function managePlayers() {
                 var currentHouseCount = 0
                 var currentBarracksCount = 0
                 var currentMageTowerCount = 0
+                var currentTownCenterCount = 0
+                var currentTownCenterId = "none"
 
                 Object.keys(units).forEach((key) => {
                     if(units[key] != null && units[key].ownerId === playerId) { currVillCount += 1; }
@@ -119,6 +144,9 @@ function managePlayers() {
                             currentBarracksCount += 1;
                         } else if (buildings[key].buildingType === "mage-tower") {
                             currentMageTowerCount += 1;
+                        } else if (buildings[key].buildingType === "town-center") {
+                            currentTownCenterCount += 1;
+                            currentTownCenterId = key;
                         }
                     }
                 })
@@ -130,6 +158,7 @@ function managePlayers() {
                     obj.buildings.house = currentHouseCount;
                     obj.buildings.barracks = currentBarracksCount;
                     obj.buildings.mageTower = currentMageTowerCount;
+                    obj.buildings.townCenterId = currentTownCenterId;
 
                     // Update your max count according to your buildings
                     obj.units.villager.max = 3 + currentHouseCount;
@@ -151,6 +180,7 @@ function managePlayers() {
                 document.querySelector(".curr-house-count").innerText = characterState.buildings.house;
                 document.querySelector(".curr-barracks-count").innerText = characterState.buildings.barracks;
                 document.querySelector(".curr-mage-tower-count").innerText = characterState.buildings.mageTower;
+                document.querySelector(".curr-town-center-count").innerText = currentTownCenterCount;
             } 
 
             el.querySelector(".Character_effects-container").innerHTML = effectsContainer;

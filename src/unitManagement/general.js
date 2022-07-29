@@ -35,6 +35,14 @@ function healthRegenUnits() {
             });
         })
 
+        Object.keys(buildings).forEach((key) => {
+            firebase.database().ref(`buildings/${key}`).transaction((obj) => { if (obj == null) { return }
+                let regen = Math.max(1, Math.round(obj.health / 60)); // Slower regen for buildings
+                obj.health = Math.min(obj.maxHealth, obj.health + regen);
+                return obj
+            });
+        })
+
         healthRegenTimer = 0;
     }
 }

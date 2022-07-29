@@ -237,3 +237,9 @@ button {
 #mage-tower-image.spawn-table-img-building {
     background: url(../images/Structure/medievalStructure_19.png) no-repeat no-repeat;
 }
+
+#town-center-image.spawn-table-img-building {
+    background: url(../images/Structure/townCenter.png) no-repeat no-repeat;
+    background-position-y: 50%;
+    margin-right: 10px;
+}

@@ -34,6 +34,19 @@ function setupBuildingSpawnButtons () {
     spawnMageTowerButton.addEventListener("click", () => {
         spawnMageTowerAt({ x: PLAYER.x, y: PLAYER.y + 1 });
     })
+
+    // TOWN CENTER
+    const townCenterCostTable = document.querySelector(".spawn-town-center-cost-table");
+
+    townCenterCostTable.querySelector(".gold-cost").innerText = townCenterCost.goldCost;
+    townCenterCostTable.querySelector(".wood-cost").innerText = townCenterCost.woodCost;
+    townCenterCostTable.querySelector(".meat-cost").innerText = townCenterCost.meatCost;
+
+    // Setup the function
+    const spawnTownCenterButton = document.querySelector(".spawn-town-center-button");
+    spawnTownCenterButton.addEventListener("click", () => {
+        spawnTownCenterAt({ x: PLAYER.x, y: PLAYER.y + 1 });
+    })
 };
 
 // ATTEMPT = 0 is down, 1 is left, 2 is right, 3 is top, 4 is just return (fail)
@@ -168,6 +181,51 @@ function spawnMageTowerAt(spawnPos, attempt = 0) {
     }
 }
 
+function spawnTownCenterAt(spawnPos, attempt =0) {
+    if((PLAYER.resources.gold >= townCenterCost.goldCost &&
+        PLAYER.resources.wood >= townCenterCost.woodCost &&
+        PLAYER.resources.meat >= townCenterCost.meatCost) ||
+        GOD_MODE) 
+        {
+
+        if(PLAYER.buildings.townCenterId !== "none") { return; }
+  
+        // Attempt other angles if down is full
+        if(!clearArea(spawnPos, players, resources, units, knights, mages, buildings)) { 
+            if (attempt === 0) { spawnPos.y -= 1; spawnPos.x -= 1 } // go to left
+            else if (attempt === 1) { spawnPos.x += 2; } // go to right
+            else if (attempt === 2) { spawnPos.x -= 1; spawnPos.y -= 1} // go to top
+
+            if (attempt < 3) { spawnTownCenterAt(spawnPos, attempt + 1) };
+
+            return 
+        }
+
+        var uuid = guidGenerator();
+
+        townCenterRef = firebase.database().ref(`buildings/${PLAYER.id}:town-center:${uuid}`);
+
+        townCenterRef.set({
+            id: `${PLAYER.id}:town-center:${uuid}`,
+            ownerId: PLAYER.id,
+            name: "Town Center",
+            buildingType: "town-center",
+            health: 400,
+            maxHealth: 400,
+            x: spawnPos.x,
+            y: spawnPos.y,
+        })
+
+        firebase.database().ref(`players/${PLAYER.id}`).transaction((obj) => { if (obj == null) { return }
+            obj.resources.gold = obj.resources.gold - townCenterCost.goldCost;
+            obj.resources.wood = obj.resources.wood - townCenterCost.woodCost;
+            obj.resources.meat = obj.resources.meat - townCenterCost.meatCost;
+
+            return obj
+        });
+    }
+}
+
 // SPAWN COSTS
 const houseCost = {
 	woodCost: 200,
@@ -181,5 +239,11 @@ const barracksCost = {
 
 const mageTowerCost = {
     goldCost: 200,
-    meatCost: 100
+    meatCost: 100,
+}
+
+const townCenterCost = {
+    goldCost: 500,
+    woodCost: 500,
+    meatCost: 500,
 }
