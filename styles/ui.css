@@ -243,3 +243,12 @@ button {
     background-position-y: 50%;
     margin-right: 10px;
 }
+
+.my-ui-tooltip {
+    color: white !important;
+    font-size: 16px !important;
+    opacity: 1 !important;
+    background: #222 !important;
+    border: none !important;
+    box-shadow: none !important;
+}

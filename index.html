@@ -23,7 +23,7 @@
 
     <div class="player-info" style="z-index: 2;">
       
-        <table class="player-reso-table">
+        <table class="player-reso-table" title="Your current health and resources">
           <tr> 
             <!-- style="display: block; text-align:center;" -->
             <td colspan="8"> <span class="player-name">  </span> </td>
@@ -56,11 +56,11 @@
         </tr>
 
         <!-- HEALTH -->
-        <tr>
+        <tr title="Increase the health and health regen of all your units">
           <td> &#129656; </td> 
           <td style="text-align:center;"> <span class="player-stat-health"></span> &nbsp; </td>
           <td style="text-align:center;"> 
-            <button class="stat-upgrade-button player-stat-health-upg-button" style="display: block; margin: auto; "> 
+            <button class="stat-upgrade-button player-stat-health-upg-button" style="display: block; margin: auto;"> 
               <svg width="22px" height="22px" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:svg="http://www.w3.org/2000/svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:ns1="http://sozi.baierouge.fr" id="Layer_1" version="1.1" viewBox="0 0 134.79859 134.3908" inkscape:version="0.91 r13725">
                 <defs id="defs39">
                   <radialGradient id="radialGradient3016" gradientUnits="userSpaceOnUse" cy="36.195" cx="52.408" gradientTransform="matrix(.96594 0 0 .96594 1.4801 1.4913)" r="105.16">
@@ -97,7 +97,7 @@
         </tr>
 
         <!-- FIGHT POWER -->
-        <tr>
+        <tr title="Increase the damage of all your units">
           <td> &#9876;&#65039; </td> 
           <td style="text-align:center;"> <span class="player-stat-attack"></span> &nbsp; </td>
           <td style="text-align:center;"> 
@@ -138,7 +138,7 @@
         </tr>
 
         <!-- MINING -->
-        <tr>
+        <tr title="Increase the mining speed of all your units">
           <td> &#9935;&#65039; </td> 
           <td style="text-align:center;"> <span class="player-stat-mine"></span> &nbsp; </td>
           <td style="text-align:center;"> 
@@ -179,7 +179,7 @@
         </tr>
 
         <!-- AXE -->
-        <tr>
+        <tr title="Increase the chopping speed of all your units">
           <td> &#129683; </td>
           <td style="text-align:center;"> <span class="player-stat-chop"></span> &nbsp; </td>
           <td style="text-align:center;"> 
@@ -220,7 +220,7 @@
         </tr>
 
         <!-- HUNTING -->
-        <tr>
+        <tr title="Increase the hunting and gathering speed of all your units">
           <td> &#127993; </td>
           <td style="text-align:center;"> <span class="player-stat-hunt"></span> &nbsp; </td>
           <td style="text-align:center;"> 
@@ -283,7 +283,7 @@
           <!-- VILLAGER -->
           <td>
             <button class="spawn-unit-button spawn-villager-button" 
-                    title="A button with very long text as in a long title of some sort or other">
+                    title="Spawn a Villager that will collect resources for you">
               <table class="player-spawn-table-single-item">
                 <tr>
                   <!-- IMAGE -->
@@ -310,7 +310,8 @@
 
           <!-- HOUSE -->
           <td>
-            <button class="spawn-unit-button spawn-house-button">
+            <button class="spawn-unit-button spawn-house-button"
+                    title="Build a House to increase your Villager limit by 1">
               <table class="player-spawn-table-single-item">
                 <tr>
                   <!-- IMAGE -->
@@ -336,7 +337,8 @@
 
           <!-- KNIGHT -->
           <td>
-            <button class="spawn-unit-button spawn-knight-button">
+            <button class="spawn-unit-button spawn-knight-button"
+                    title="Spawn a Knight that will fight for you">
               <table class="player-spawn-table-single-item">
                 <tr>
                   <!-- IMAGE -->
@@ -363,7 +365,8 @@
 
           <!-- BARRACKS -->
           <td>
-            <button class="spawn-unit-button spawn-barracks-button">
+            <button class="spawn-unit-button spawn-barracks-button"
+                    title="Build a Barracks to increase your Knight limit by 1">
               <table class="player-spawn-table-single-item">
                 <tr>
                   <!-- IMAGE -->
@@ -389,7 +392,8 @@
 
           <!-- MAGE -->
           <td>
-            <button class="spawn-unit-button spawn-mage-button">
+            <button class="spawn-unit-button spawn-mage-button"
+                    title="Spawn a Mage that will fight for you">
               <table class="player-spawn-table-single-item">
                 <tr>
                   <!-- IMAGE -->
@@ -416,7 +420,8 @@
 
           <!-- MAGE TOWER -->
           <td>
-            <button class="spawn-unit-button spawn-mage-tower-button">
+            <button class="spawn-unit-button spawn-mage-tower-button"
+                    title="Build a Mage Tower to increase your Mage limit by 1">
               <table class="player-spawn-table-single-item">
                 <tr>
                   <!-- IMAGE -->
@@ -442,7 +447,8 @@
 
           <!-- TOWN CENTER -->
           <td>
-            <button class="spawn-unit-button spawn-town-center-button">
+            <button class="spawn-unit-button spawn-town-center-button"
+                    title="Build a Town Center to respawn in if you die">
               <table class="player-spawn-table-single-item">
                 <tr>
                   <!-- IMAGE -->
@@ -470,7 +476,7 @@
       </table>
     </div>
 
-    <div class="minimap">
+    <div class="minimap" data-html="true" title="">
       <div class="minimap-frame">
       </div>
     </div>
@@ -527,8 +533,14 @@
 
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <link href="https://code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css" rel="stylesheet" type="text/css" />
     <script type="text/javascript">
-      $(document).tooltip({show: null});
+      // $(document).tooltip({show: null  });
+      $(document).tooltip({
+        tooltipClass: "my-ui-tooltip",
+        show: false, // no delay
+        hide: false, // no delay
+      });
     </script>
   </body>
 </html>
