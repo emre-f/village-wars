@@ -2,28 +2,39 @@
     --sprite-scale: 1;
 }
 
-.Resource_sprite[data-resource-type="wood"] {
+.Resource[data-resource-type="wood"] .Resource_sprite {
     background: url(../images/Environment/medievalEnvironment_04.png);
     transform: scale(var(--sprite-scale));
 }
 
-.Resource_sprite[data-resource-type="gold"] {
+.Resource[data-resource-type="gold"] .Resource_sprite {
     background: url(../images/Environment/medievalEnvironment_12.png);
     transform: scale(var(--sprite-scale));
 }
 
-.Resource_sprite[data-resource-type="meat"] {
-    --sprite-scale: 2;
-
-    background: url(../images/Environment/medievalEnvironment_20.png);
+.Resource[data-resource-type="meat"] .Resource_sprite {
+    background: url(../images/Environment/bigBush.png);
     transform: scale(var(--sprite-scale));
 }
 
 .Resource_shadow {
     background: url(../images/Unit/shadow.png) no-repeat no-repeat;
-    transform: scale(2);
-    top: 55px;
-    left: 45px;
+    transform: scale(3);
+}
+
+.Resource[data-resource-type="wood"] .Resource_shadow {
+    top: 80px;
+    left: 72px;
+}
+
+.Resource[data-resource-type="gold"] .Resource_shadow {
+    top: 70px;
+    left: 72px;
+}
+
+.Resource[data-resource-type="meat"] .Resource_shadow {
+    top: 70px;
+    left: 72px;
 }
 
 .Resource_amount-container {

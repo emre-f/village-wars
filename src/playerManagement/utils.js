@@ -9,9 +9,6 @@ function stealResources(killerPlayerId, killedPlayer) {
 	})
 }
 
-var resetLastDamagedByTimer = 8;
-var resetLastDamagedByTimerCD = 8;
-
 var resetLastDamagedTimer = 8;
 var resetLastDamagedTimerCD = 8;
 
@@ -31,6 +28,9 @@ function resetLastDamaged() {
 		resetLastDamagedTimer = 0;
 	}
 }
+
+var resetLastDamagedByTimer = 8;
+var resetLastDamagedByTimerCD = 8;
 
 function resetLastDamagedBy() {
 	checkIfYouGotHit();

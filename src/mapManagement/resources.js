@@ -55,7 +55,7 @@ function manageResources() {
 
         //Fill in some initial state
         resourceElement.setAttribute("data-position", `${getKeyString(addedResource.x, addedResource.y)}`);
-        resourceElement.querySelector(".Resource_sprite").setAttribute("data-resource-type", addedResource.type);
+        resourceElement.setAttribute("data-resource-type", addedResource.type);
         resourceElement.querySelector(".Resource_amount_left").innerText = addedResource.amountLeft;
         resourceElement.querySelector(".Resource_amount_max").innerText = addedResource.amountMax;
 

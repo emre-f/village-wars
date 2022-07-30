@@ -92,7 +92,7 @@ body {
     image-rendering: pixelated;
 
     /* to cover around edges, no "leaking" when moving */
-    transform:scale(2);
+    transform:scale(1.05);
 }
 
 /* sand */
