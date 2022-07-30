@@ -137,7 +137,7 @@
             // Wait 500ms for the resources from server to load (we need to check positions to stop overlap!)
             setTimeout(() => {
                 playerRef = firebase.database().ref(`players/${playerId}`);
-                const { x, y } = getRandomSafeSpot();
+                const { x, y } = getRandomSafeSpot(true);
 
                 playerRef.set({
                     id: playerId,

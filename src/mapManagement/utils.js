@@ -35,14 +35,25 @@ function isOccupiedByPlayer(x, y, playersArray) {
 	return false;
 }
 
-function getRandomSafeSpot() {
-	var mapSize = MAP_SIZE;
+function getRandomSafeSpot(withinCameraGap = false) {
 	let counter = 0;
+
+	// For player we only spawn within camera bounds (because camera is supposed to stop moving near the edges)
+	bounds = {
+		x: {
+			lower: 0 + (withinCameraGap? cameraGap.x : 0),
+			higher: MAP_SIZE - (withinCameraGap? cameraGap.x : 0)
+		},
+		y: {
+			lower: 0 + (withinCameraGap? cameraGap.y : 0),
+			higher: MAP_SIZE - (withinCameraGap? cameraGap.y : 0)
+		}
+	}
 
 	while (true) {
 		let chosenPos = { 
-			x: Math.floor( 0 + Math.random() * (mapSize - 0)),
-			y: Math.floor( 0 + Math.random() * (mapSize - 0))
+			x: Math.floor( bounds.x.lower + Math.random() * (bounds.x.higher - bounds.x.lower)),
+			y: Math.floor( bounds.y.lower + Math.random() * (bounds.y.higher - bounds.y.lower))
 		}
 
 		if (counter >= 100) {

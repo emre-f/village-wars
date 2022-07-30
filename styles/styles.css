@@ -53,7 +53,7 @@ body {
     height: calc(4px * var(--camera-height-multi));
     overflow: hidden;
     background: #61ddf7;
-    position:relative;
+    position: relative;
 }
 
 .game-container {
