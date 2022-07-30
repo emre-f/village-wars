@@ -23,13 +23,13 @@
 
     <div class="player-info" style="z-index: 2;">
       
-        <table class="player-reso-table" title="Your current health and resources">
+        <table class="player-reso-table">
           <tr> 
             <!-- style="display: block; text-align:center;" -->
             <td colspan="8"> <span class="player-name">  </span> </td>
           </tr>
 
-          <tr>
+          <tr title="Your current health and resources">
             <td> &#10084;&#65039; </td> 
             <td> <span class="player-reso player-health"></span> &nbsp;&nbsp; </td>
             <td> &#128511; </td> 
@@ -38,6 +38,17 @@
             <td> <span class="player-reso player-wood"></span> &nbsp;&nbsp; </td>
             <td> &#127830; </td>
             <td> <span class="player-reso player-meat"></span> &nbsp;&nbsp; </td>
+          </tr>
+
+          <tr>
+            <td colspan="8">
+              <div style="font-size: 18px; font-weight: bold; color:white; white-space: pre-wrap; line-height: 10px;"
+                      title="&#8226; Use arrow keys or WASD to move. 
+                             &#8226; Move into resources, players or units to interact with them. &#10240;&#10240;&#10240;&#10240;&#10240;&#10240;&#10240;
+                             &#8226; Collect resources from the nature or other players. Use resources to spawn units and get stronger.">
+                <span style="background-color: #222; border-radius: 6px; padding: 4px;">&#10;HOW TO PLAY</span>
+              </div>
+            </td>
           </tr>
         </table>
 
@@ -477,19 +488,7 @@
     </div>
 
     <div class="minimap" data-html="true" title="">
-      <table>
-        <tr>
-          <td> <div style="text-align: center; font-size: 18px; font-weight: bold; color:white;"
-                    title="Use arrow keys or WASD to move. Move into resources, players or units to interact with them.">
-            <span style="background-color: #222; border-radius: 6px; padding: 4px;">HOW TO</span>
-          </div></td>
-        </tr>
-
-        <tr>
-          <td> <div class="minimap-frame"> </div> </td>
-        </tr>
-      </table>
-      </div>
+      <div class="minimap-frame"> </div>
     </div>
 
     <!-- the backbone -->
