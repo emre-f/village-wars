@@ -29,6 +29,7 @@ function setupUpgradeButtons () {
 
             firebase.database().ref(`players/${PLAYER.id}`).transaction((obj) => { if (obj == null) { return }
                 obj.health = obj.health + 20,
+                obj.maxHealth = obj.maxHealth + 20,
                 obj.resources = {
                     gold: obj.resources.gold - costs.goldCost,
                     wood: obj.resources.wood - costs.woodCost,
@@ -68,8 +69,8 @@ function setupUpgradeButtons () {
         Object.keys(mages).forEach((key) => {
             firebase.database().ref(`mages/${key}`).transaction((obj) => { if (obj == null) { return }
                 if (obj.ownerId !== playerId) { return; } // Only buff health of ur units
-                obj.health = obj.health + 3
-                obj.maxHealth = obj.maxHealth + 3
+                obj.health = obj.health + 2
+                obj.maxHealth = obj.maxHealth + 2
                 return obj
             });
         })

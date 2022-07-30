@@ -10,7 +10,7 @@ function getTargets() {
         result["tribe"] = "units";
         allPotentialTargetPos.push(result)
 
-        if( PLAYER && units[key].ownerId === PLAYER.lastDamagedId ) { ownerTargets.push( { x: units[key].x, y: units[key].y } ) };
+        if( PLAYER && units[key].ownerId === PLAYER.lastDamagedId ) { ownerTargets.push(result) };
     })
 
     Object.keys(players).forEach((key) => {
@@ -19,7 +19,7 @@ function getTargets() {
         result["tribe"] = "players";
         allPotentialTargetPos.push(result);
 
-        if( PLAYER && players[key].id === PLAYER.lastDamagedId ) { ownerTargets.push( { x: players[key].x, y: players[key].y } ) };
+        if( PLAYER && players[key].id === PLAYER.lastDamagedId ) { ownerTargets.push(result) };
     })
 
     Object.keys(knights).forEach((key) => {
@@ -28,7 +28,7 @@ function getTargets() {
         result["tribe"] = "knights";
         allPotentialTargetPos.push(result);
 
-        if( PLAYER && knights[key].ownerId === PLAYER.lastDamagedId ) { ownerTargets.push( { x: knights[key].x, y: knights[key].y } ) };
+        if( PLAYER && knights[key].ownerId === PLAYER.lastDamagedId ) { ownerTargets.push(result) };
     })
     
     Object.keys(mages).forEach((key) => {
@@ -37,7 +37,7 @@ function getTargets() {
         result["tribe"] = "mages";
         allPotentialTargetPos.push(result);
 
-        if( PLAYER && mages[key].ownerId === PLAYER.lastDamagedId ) { ownerTargets.push( { x: mages[key].x, y: mages[key].y } ) };
+        if( PLAYER && mages[key].ownerId === PLAYER.lastDamagedId ) { ownerTargets.push(result) };
     })
 
     Object.keys(buildings).forEach((key) => {
@@ -46,7 +46,7 @@ function getTargets() {
         result["tribe"] = "buildings";
         allPotentialTargetPos.push(result);
 
-        if( PLAYER && buildings[key].ownerId === PLAYER.lastDamagedId ) { ownerTargets.push( { x: buildings[key].x, y: buildings[key].y } ) };
+        if( PLAYER && buildings[key].ownerId === PLAYER.lastDamagedId ) { ownerTargets.push(result) };
     })
 
     return {

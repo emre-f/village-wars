@@ -308,6 +308,7 @@ function moveCharacter() {
             ref.transaction((obj) => { if (obj == null) { return }
                 obj.health = obj.health  - PLAYER.damage;
                 obj.lastDamagedById = playerId;
+                obj.recentlyDamaged = true;
                 return obj
             })
 
@@ -315,6 +316,7 @@ function moveCharacter() {
                 obj.lastDamagedId = hitTarget.id;
                 return obj
             })
+            resetLastDamagedTimer = 0; // Zero the timer
 
             swordSlash( { x: PLAYER.x, y: PLAYER.y }, {x: hitTarget.x, y: hitTarget.y } );
             return;
@@ -452,24 +454,5 @@ function moveCharacter() {
                 return obj
             })
         }
-    }
-}
-
-function resetTargets() {
-    if(resetTargetsTimer < resetTargetsTimerCD) {
-        resetTargetsTimer += 1/60;
-    } else {
-
-        Object.keys(players).forEach((key) => {
-            if(players[key].lastDamagedById === "none" && players[key].lastDamagedId === "none") { return }
-
-            firebase.database().ref(`players/${key}`).transaction((obj) => { if (obj == null) { return }
-                obj.lastDamagedById = "none";
-                obj.lastDamagedId = "none";
-                return obj
-            });
-        })
-
-        resetTargetsTimer = 0;
     }
 }

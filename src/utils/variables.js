@@ -40,9 +40,6 @@ var mageMoverTimerCD = 0.4;
 var healthRegenTimer = 1.6;
 var healthRegenTimerCD = 1.6;
 
-var resetTargetsTimer = 8;
-var resetTargetsTimerCD = 8;
-
 var minimapUpdateTimer = 0.2;
 var minimapUpdateTimerCD = 0.2;
 

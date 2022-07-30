@@ -12,16 +12,16 @@
             console.log("ADMIN: NEW MAP GENERATED")
         } else if (currentKeysPressed['z'] && currentKeysPressed['x'] && event.key === '9') {
             GOD_MODE = !GOD_MODE; // flip god mode
-            console.log("ADMIN: GOD_MODE is " + GOD_MODE)
+            console.log("ADMIN: GOD_MODE is " + (GOD_MODE? "on":"off"))
         }
 
         currentKeysPressed[event.key] = true;
     })
     
     document.addEventListener("keyup", (e) => {
-        var dir = keys[e.which];
-        var index = held_directions.indexOf(dir);
-        if (index > -1) {
+        var dir = keys[e.which]; // Key that is moved up now
+        var index = held_directions.indexOf(dir); // Look up that key in the list
+        if (index > -1) { // If it was being held, remove it
             held_directions.splice(index, 1)
         }
 
@@ -29,13 +29,16 @@
     });
 
     const step = (timestamp) => {
-        if(timestamp - lastTimestamp > 100) {console.log("lag")};
+        if(timestamp - lastTimestamp > 80) {console.log(`lag (${Math.round(timestamp - lastTimestamp)})`)};
         requestAnimationFrame(step);
         if (timestamp - lastTimestamp < 1000 / FPS) return;
 
         pixel_size = parseInt(
             getComputedStyle(document.documentElement).getPropertyValue('--pixel-size')
         );
+
+        // If tab is out of focus, clear the currently pressed keys
+        if(!document.hasFocus()) { currentKeysPressed = {}; held_directions = []; };
 
         if (playerId in players) { // Player must be loaded in
             moveCharacter();
@@ -44,9 +47,11 @@
             if(players[playerId].adminPlayer) {
                 resourceHandler();
                 healthRegenUnits();
-                resetTargets();
             }
             
+            resetLastDamaged();
+            resetLastDamagedBy();
+
             unitHandler();
             knightHandler();
             mageHandler();
@@ -63,16 +68,6 @@
     }
 
     function initGame() {
-
-        // Only generate if you are admitted as the admin! (see players.js)
-        // generateMap(MAP_SIZE); 
-
-        // var setMinimapInterval = setInterval(() => {
-        //     if(Object.keys(unitCells).length === 0 || unitCells[Object.keys(unitCells)[0]].x == null) { return; }
-
-        //     setMinimap();
-        //     clearInterval(setMinimapInterval);
-        // }, 10);
 
         manageUnitCells();
         managePlayers(); // Returns the list of players
@@ -91,7 +86,6 @@
         step(); 
     }
     
-
     firebase.auth().onAuthStateChanged((user) => {
         var checkPlayers = setInterval(function(){
             if(playerId in players) {
@@ -189,6 +183,7 @@
                     y,
                     lastDamagedId: "none",
                     lastDamagedById: "none",
+                    recentlyDamaged: false,
                 })
 
                 // Set player name on UI

@@ -181,7 +181,7 @@ function spawnMageAt(spawnPos, attempt = 0) {
             ownerId: PLAYER.id,
             name: "Mage",
             health: 20 + 3 * PLAYER.stats.healthLevel,
-            maxHealth: 20 + 3 * PLAYER.stats.healthLevel,
+            maxHealth: 15 + 2 * PLAYER.stats.healthLevel,
             damage: 4,
             color: PLAYER.color,
             bodyType: 5,
