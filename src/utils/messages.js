@@ -1,4 +1,4 @@
-const messageQueue = []
+const messageQueue = [] // has content and optional color
 var messageUp = false;
 const messageHolderElement = document.querySelector(".message");
 
@@ -9,7 +9,11 @@ function renderMessages() {
 
     const ele = document.createElement("div");
     ele.classList.add("curr-msg");
-    ele.innerHTML = messageQueue[0];
+    // ele.innerHTML = messageQueue[0].content;
+    ele.innerHTML = `
+        <span style="color:${messageQueue[0].color};">${messageQueue[0].content}</span>
+    `;
+
     messageQueue.shift(); // Remove 0th element
     
     messageHolderElement.appendChild(ele);
@@ -20,6 +24,6 @@ function renderMessages() {
     }, 2000);
 }
 
-function addMessageToQueue(str) {
-    messageQueue.push(str);
+function addMessageToQueue(str, color = "white") {
+    messageQueue.push({content: str, color});
 }

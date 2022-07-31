@@ -93,7 +93,7 @@ function managePlayers() {
                 // Give your resources to your killer
                 if (characterState.lastDamagedById !== "none") {
                     console.log(characterState.name + " was killed by " + players[characterState.lastDamagedById].name)
-                    addMessageToQueue(characterState.name + " &#9876;&#65039; " + players[characterState.lastDamagedById].name);
+                    addMessageToQueue(characterState.name + " &#9876;&#65039; " + players[characterState.lastDamagedById].name, "red");
                     stealResources(characterState.lastDamagedById, characterState)
                 }
 
