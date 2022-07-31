@@ -1,3 +1,12 @@
+VILLAGER_BASE_HEALTH = 20;
+VILLAGER_HEALTH_SCALE = 3;
+
+KNIGHT_BASE_HEALTH = 50;
+KNIGHT_HEALTH_SCALE = 5;
+
+MAGE_BASE_HEALTH = 20;
+MAGE_HEALTH_SCALE = 2;
+
 // Purpose: Networking/Managing all units on the DB
 function manageUnits() {
     const allUnitsRef = firebase.database().ref(`units`);

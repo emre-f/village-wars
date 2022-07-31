@@ -25,7 +25,7 @@ function setupUpgradeButtons () {
            PLAYER.resources.meat >= costs.meatCost) ||
            GOD_MODE) 
            {
-            if(PLAYER.stats.healthLevel === 10) { return; }
+            if(PLAYER.stats.healthLevel === 20) { return; }
 
             firebase.database().ref(`players/${PLAYER.id}`).transaction((obj) => { if (obj == null) { return }
                 obj.health = obj.health + 20,
@@ -51,8 +51,8 @@ function setupUpgradeButtons () {
         Object.keys(units).forEach((key) => {
             firebase.database().ref(`units/${key}`).transaction((obj) => { if (obj == null) { return }
                 if (obj.ownerId !== playerId) { return; } // Only buff health of ur units
-                obj.health = obj.health + 3
-                obj.maxHealth = obj.maxHealth + 3
+                obj.health = obj.health + VILLAGER_HEALTH_SCALE
+                obj.maxHealth = obj.maxHealth + VILLAGER_HEALTH_SCALE
                 return obj
             });
         })
@@ -60,8 +60,8 @@ function setupUpgradeButtons () {
         Object.keys(knights).forEach((key) => {
             firebase.database().ref(`knights/${key}`).transaction((obj) => { if (obj == null) { return }
                 if (obj.ownerId !== playerId) { return; } // Only buff health of ur units     
-                obj.health = obj.health + 7
-                obj.maxHealth = obj.maxHealth + 7
+                obj.health = obj.health + KNIGHT_HEALTH_SCALE
+                obj.maxHealth = obj.maxHealth + KNIGHT_HEALTH_SCALE
                 return obj
             });
         })
@@ -69,8 +69,8 @@ function setupUpgradeButtons () {
         Object.keys(mages).forEach((key) => {
             firebase.database().ref(`mages/${key}`).transaction((obj) => { if (obj == null) { return }
                 if (obj.ownerId !== playerId) { return; } // Only buff health of ur units
-                obj.health = obj.health + 2
-                obj.maxHealth = obj.maxHealth + 2
+                obj.health = obj.health + MAGE_HEALTH_SCALE
+                obj.maxHealth = obj.maxHealth + MAGE_HEALTH_SCALE
                 return obj
             });
         })
@@ -85,7 +85,7 @@ function setupUpgradeButtons () {
            PLAYER.resources.meat >= costs.meatCost) ||
            GOD_MODE) 
            {
-            if(PLAYER.stats.attackLevel === 10) { return; }
+            if(PLAYER.stats.attackLevel === 20) { return; }
 
             firebase.database().ref(`players/${PLAYER.id}`).transaction((obj) => { if (obj == null) { return }
                 obj.damage = obj.damage + 2,
@@ -261,11 +261,12 @@ function updateUpgrades(healthLevel = 0, attackLevel = 0, mineLevel = 0, chopLev
 }
 
 // With each level costs go up +25%, after level 5 they go up +35%
-var SMALL_SCALE = 0.25;
-var LARGE_BONUS_SCALE = 0.1;
+var SMALL_SCALE = 0.4;
+var LARGE_BONUS_SCALE = 0.2; // Scale after 5
+var FINAL_BONUS_SCALE = 0.3; // Scale after 10
 
 function getHealthUpgradeCosts (currLevel = 0) {
-    var mod = 1 + (SMALL_SCALE * currLevel) + (LARGE_BONUS_SCALE * Math.max(currLevel - 5, 0));
+    var mod = 1 + (SMALL_SCALE * currLevel) + (LARGE_BONUS_SCALE * Math.max(currLevel - 5, 0) + (FINAL_BONUS_SCALE * Math.max(currLevel - 10, 0)));
 
     return {
         goldCost: Math.round(20 * mod),
@@ -275,7 +276,7 @@ function getHealthUpgradeCosts (currLevel = 0) {
 }
 
 function getAttackUpgradeCosts (currLevel = 0) {
-    var mod = 1 + (SMALL_SCALE * currLevel) + (LARGE_BONUS_SCALE * Math.max(currLevel - 5, 0));
+    var mod = 1 + (SMALL_SCALE * currLevel) + (LARGE_BONUS_SCALE * Math.max(currLevel - 5, 0) + (FINAL_BONUS_SCALE * Math.max(currLevel - 10, 0)));
 
     return {
         goldCost: Math.round(10 * mod),
@@ -285,31 +286,31 @@ function getAttackUpgradeCosts (currLevel = 0) {
 }
 
 function getMineUpgradeCosts (currLevel = 0) {
-    var mod = 1 + (SMALL_SCALE * currLevel) + (LARGE_BONUS_SCALE * Math.max(currLevel - 5, 0));
+    var mod = 1 + (SMALL_SCALE * currLevel) + (LARGE_BONUS_SCALE * Math.max(currLevel - 5, 0) + (FINAL_BONUS_SCALE * Math.max(currLevel - 10, 0)));
 
     return {
         // goldCost: Math.round(0 * mod),
-        woodCost: Math.round(20 * mod),
-        meatCost: Math.round(20 * mod),
+        woodCost: Math.round(30 * mod),
+        meatCost: Math.round(30 * mod),
     }
 }
 
 function getChopUpgradeCosts (currLevel = 0) {
-    var mod = 1 + (SMALL_SCALE * currLevel) + (LARGE_BONUS_SCALE * Math.max(currLevel - 5, 0));
+    var mod = 1 + (SMALL_SCALE * currLevel) + (LARGE_BONUS_SCALE * Math.max(currLevel - 5, 0) + (FINAL_BONUS_SCALE * Math.max(currLevel - 10, 0)));
 
     return {
-        goldCost: Math.round(20 * mod),
+        goldCost: Math.round(30 * mod),
         // woodCost: Math.round(0 * mod),
-        meatCost: Math.round(20 * mod),
+        meatCost: Math.round(30 * mod),
     }
 }
 
 function getHuntUpgradeCosts (currLevel = 0) {
-    var mod = 1 + (SMALL_SCALE * currLevel) + (LARGE_BONUS_SCALE * Math.max(currLevel - 5, 0));
+    var mod = 1 + (SMALL_SCALE * currLevel) + (LARGE_BONUS_SCALE * Math.max(currLevel - 5, 0) + (FINAL_BONUS_SCALE * Math.max(currLevel - 10, 0)));
 
     return {
-        goldCost: Math.round(20 * mod),
-        woodCost: Math.round(20 * mod),
+        goldCost: Math.round(30 * mod),
+        woodCost: Math.round(30 * mod),
         // meatCost: Math.round(0 * mod),
     }
 }
