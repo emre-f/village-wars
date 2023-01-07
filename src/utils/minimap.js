@@ -66,6 +66,7 @@ function setMinimap() {
     console.log("Minimap Set")
 }
 
+// NOT USED ANYMORE
 function updateMinimap() {
     if (minimapUpdateTimer < minimapUpdateTimerCD) {
         minimapUpdateTimer += 1/60;
